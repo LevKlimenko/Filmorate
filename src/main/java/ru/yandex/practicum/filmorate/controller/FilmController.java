@@ -3,20 +3,23 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.*;
+import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
+import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmReleaseDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
 public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final HashMap<Integer, Film> films = new HashMap<>();
-    private final HashMap<Integer, String> nameFilmWithID = new HashMap<>();
+    private static final LocalDate MIN_DATE_FOR_RELEASE = LocalDate.of(1895, 12, 28);
+    private final Map<Integer, Film> films = new HashMap<>();
+    private final Map<Integer, String> nameFilmWithID = new HashMap<>();
     private int id;
 
     @GetMapping
@@ -26,25 +29,8 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        if (film.getName() == null) {
-            throw new FilmNullNameException("Отсутствует название фильма");
-        }
-        if (films.values().toString().contains(film.getName())) {
-            throw new FilmAlreadyExistException("Фильм " + film.getName() + " уже есть в базе");
-        }
-        if (film.getDescription().length() > 200) {
-            throw new FilmBadDescriptionException("Максимальная длина описания - 200 символов. Длина описания " +
-                    film.getDescription().length() + " символов");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new FilmReleaseDateException("Дата релиза должна быть не раньше 28 декабря 1895 года. " +
-                    "Текущее значение" + film.getReleaseDate());
-        }
-        if (film.getDuration() < 0) {
-            throw new FilmDurationException("Продолжительность фильма должна быть положительной. " +
-                    "Текущее значение: " + film.getDuration() + " минут");
-        }
-        id = ++id;
+        checkFailDateReleaseBeforeMin(film);
+        ++id;
         film.setId(id);
         films.put(film.getId(), film);
         log.info("Фильм {} сохранен с ID={}", film.getName(), film.getId());
@@ -53,27 +39,19 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        if (film.getName() == null) {
-            throw new FilmNullNameException("Отсутствует название фильма");
-        }
         if (!films.containsKey(film.getId())) {
             throw new FilmIdException("Фильма с ID=" + film.getId() + " в базе нет");
         }
-        if (film.getDescription().length() > 200) {
-            throw new FilmBadDescriptionException("Максимальная длина описания - 200 символов. Длина описания " +
-                    film.getDescription().length() + " символов");
-        }
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new FilmReleaseDateException("Дата релиза должна быть не раньше 28 декабря 1895 года. " +
-                    "Текущее значение " + film.getReleaseDate());
-        }
-        if (film.getDuration() < 0) {
-            throw new FilmDurationException("Продолжительность фильма должна быть положительной. " +
-                    "Текущее значение: " + film.getDuration() + " минут");
-        }
+        checkFailDateReleaseBeforeMin(film);
         films.put(film.getId(), film);
         log.info("Фильм {} обновлен", film.getName());
         return film;
+    }
+
+    private void checkFailDateReleaseBeforeMin(Film film) {
+        if (film.getReleaseDate().isBefore(MIN_DATE_FOR_RELEASE)) {
+            throw new FilmReleaseDateException("Время релиза должно быть позже " + MIN_DATE_FOR_RELEASE);
+        }
     }
 
 
