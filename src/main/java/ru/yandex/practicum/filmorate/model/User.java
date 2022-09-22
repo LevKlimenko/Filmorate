@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Data
 @Builder
 public class User {
-    @NotNull
     @Positive(message = "Значение ID должно быть больше 0")
     private Integer id;
     @Email(message = "Введите действительный E-mail")
