@@ -226,8 +226,6 @@ public class FilmControllerTest {
         assertEquals(1, fc.getAllFilms().size(), "Количество фильмов отлично от 1");
     }
 
-
-
     @Test
     public void putNormalFilm() {
         film = Film.builder()
@@ -246,8 +244,7 @@ public class FilmControllerTest {
                 .duration(50)
                 .build();
         fc.updateFilm(film2);
-        assertEquals(1,fc.getAllFilms().size(),"Количество фильмов не совпадает");
-
+        assertEquals(1, fc.getAllFilms().size(), "Количество фильмов не совпадает");
     }
 
     @Test

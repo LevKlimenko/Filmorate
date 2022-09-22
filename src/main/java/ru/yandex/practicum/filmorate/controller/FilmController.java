@@ -25,7 +25,7 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@RequestBody Film film) {
-        if (film.getName()==null) {
+        if (film.getName() == null) {
             throw new FilmNullNameException("Отсутствует название фильма");
         }
         if (films.values().toString().contains(film.getName())) {
@@ -39,7 +39,7 @@ public class FilmController {
             throw new FilmReleaseDateException("Дата релиза должна быть не раньше 28 декабря 1895 года. " +
                     "Текущее значение" + film.getReleaseDate());
         }
-        if (film.getDuration()<0) {
+        if (film.getDuration() < 0) {
             throw new FilmDurationException("Продолжительность фильма должна быть положительной. " +
                     "Текущее значение: " + film.getDuration() + " минут");
         }
@@ -52,10 +52,10 @@ public class FilmController {
 
     @PutMapping
     public Film updateFilm(@RequestBody Film film) {
-        if (film.getName()==null) {
+        if (film.getName() == null) {
             throw new FilmNullNameException("Отсутствует название фильма");
         }
-        if (!films.containsKey(film.getId())){
+        if (!films.containsKey(film.getId())) {
             throw new FilmIdException("Фильма с ID=" + film.getId() + " в базе нет");
         }
         if (film.getDescription().length() > 200) {
@@ -66,7 +66,7 @@ public class FilmController {
             throw new FilmReleaseDateException("Дата релиза должна быть не раньше 28 декабря 1895 года. " +
                     "Текущее значение " + film.getReleaseDate());
         }
-        if (film.getDuration()<0) {
+        if (film.getDuration() < 0) {
             throw new FilmDurationException("Продолжительность фильма должна быть положительной. " +
                     "Текущее значение: " + film.getDuration() + " минут");
         }
