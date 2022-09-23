@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmReleaseDateException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import javax.validation.Valid;
@@ -19,7 +18,6 @@ public class FilmController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
     private static final LocalDate MIN_DATE_FOR_RELEASE = LocalDate.of(1895, 12, 28);
     private final Map<Integer, Film> films = new HashMap<>();
-    private final Map<Integer, String> nameFilmWithID = new HashMap<>();
     private int id;
 
     @GetMapping
@@ -29,7 +27,6 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        checkFailDateReleaseBeforeMin(film);
         ++id;
         film.setId(id);
         films.put(film.getId(), film);
@@ -42,17 +39,8 @@ public class FilmController {
         if (!films.containsKey(film.getId())) {
             throw new FilmIdException("Фильма с ID=" + film.getId() + " в базе нет");
         }
-        checkFailDateReleaseBeforeMin(film);
         films.put(film.getId(), film);
         log.info("Фильм {} обновлен", film.getName());
         return film;
     }
-
-    private void checkFailDateReleaseBeforeMin(Film film) {
-        if (film.getReleaseDate().isBefore(MIN_DATE_FOR_RELEASE)) {
-            throw new FilmReleaseDateException("Время релиза должно быть позже " + MIN_DATE_FOR_RELEASE);
-        }
-    }
-
-
 }
