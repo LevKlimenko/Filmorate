@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserBadL
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserIdException;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserWithoutIdException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -19,7 +21,7 @@ public class UserControllerTest {
 
     User user;
 
-    UserController uc = new UserController();
+    InMemoryUserStorage uc = new InMemoryUserStorage();
 
 
     /**
@@ -141,7 +143,7 @@ public class UserControllerTest {
                 .build();
         uc.updateUser(user2);
         assertEquals(1, uc.getAllUser().size(), "Количество пользователей не совпадает");
-        assertEquals(user2, uc.getUsers().get(1), "Пользователи не совпадают");
+        assertEquals(user2, uc.getUsers().get((long)1), "Пользователи не совпадают");
     }
 
     @Test

@@ -9,6 +9,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -23,4 +27,9 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveOrZero(message = "Продолжительность должна быть больше или равно 0")
     private int duration;
+    private final Set<Integer> likesId = new HashSet<>();
+
+    //public void addLikeByUser(int userId){
+       // likesId.add(userId);
+   // }
 }
