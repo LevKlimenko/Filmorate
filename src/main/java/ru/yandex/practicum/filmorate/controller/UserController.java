@@ -53,5 +53,18 @@ public class UserController {
       return userStorage.updateUser(user);
     }
 
+    @GetMapping("/{userId}")
+    @ExceptionHandler
+    public User findUser(@PathVariable("userId") Integer userId){
+        return userStorage.findUserById(userId);
+    }
+
+    @PutMapping("/{user1}/friends/{user2}")
+    public User addFriends(@PathVariable("user1") Integer user1,
+                           @PathVariable("user2") Integer user2){
+        userService.becomeFriend(user1,user2);
+        return userStorage.getUsers().get(user1);
+    }
+
 }
 

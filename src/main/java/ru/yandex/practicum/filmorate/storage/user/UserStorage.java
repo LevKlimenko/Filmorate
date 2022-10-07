@@ -9,6 +9,7 @@ public interface UserStorage {
     Collection<User> getAllUser();
     User createUser(User user);
     User updateUser(User user);
+    User findUserById(Integer id);
     Map<Integer, User> getUsers();
     long getGeneratorId();
 }

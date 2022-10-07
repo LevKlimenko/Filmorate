@@ -60,6 +60,14 @@ public class InMemoryUserStorage implements UserStorage{
         return user;
     }
 
+    @Override
+    public User findUserById(Integer userId) {
+        if (!users.containsKey(userId)){
+            throw new UserIdException(String.format("Пользователь № %d не найден", userId ));
+        }
+        return users.get(userId);
+    }
+
     private void checkSpaceInLogin(User user) {
         if (user.getLogin().contains(" "))
             throw new UserBadLoginException("Логин не может содержать пробелы");
@@ -89,4 +97,6 @@ public class InMemoryUserStorage implements UserStorage{
     public long getGeneratorId() {
         return generatorId;
     }
+
+
 }
