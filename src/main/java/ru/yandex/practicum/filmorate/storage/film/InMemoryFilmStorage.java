@@ -25,7 +25,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             return 1;
         }
         if (o1.getLikesId().size() == o2.getLikesId().size()) {
-            return 0;
+            return o1.getId()-o2.getId();
         } else {
             return -1;
         }

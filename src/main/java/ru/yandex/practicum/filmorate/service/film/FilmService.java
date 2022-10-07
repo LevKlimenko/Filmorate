@@ -35,6 +35,7 @@ public class FilmService {
     public void addLike(int filmId, int userId) {
         Film film = filmStorage.findFilmById(filmId);
         if (userStorage.getUsers().containsKey(userId)) {
+            filmStorage.getCompareFilm().remove(filmStorage.getFilms().get(filmId));
             film.getLikesId().add(userId);
             filmStorage.getCompareFilm().add(filmStorage.getFilms().get(filmId));
         } else {
@@ -45,6 +46,7 @@ public class FilmService {
     public void deleteLike(int filmId, int userId) {
         Film film = filmStorage.findFilmById(filmId);
         if (userStorage.getUsers().containsKey(userId)) {
+            filmStorage.getCompareFilm().remove(filmStorage.getFilms().get(filmId));
             film.getLikesId().remove(userId);
             filmStorage.getCompareFilm().add(filmStorage.getFilms().get(filmId));
         } else {
@@ -53,14 +55,17 @@ public class FilmService {
     }
 
     public List<Film> showMostLikedFilms(Integer count) {
-       /* ArrayList<Film> sortFilm = new ArrayList<>(compareFilm);
+       ArrayList<Film> sortFilm = new ArrayList<>(filmStorage.getCompareFilm());
         List<Film> likedFilms = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            likedFilms.add(sortFilm.get(i));
-        }*/
-        return filmStorage.getCompareFilm().stream()
-                .limit(count)
-                .collect(Collectors.toList());
+        if (count>sortFilm.size()){
+            count=sortFilm.size();
+        }
+        if (sortFilm.size()>0) {
+            for (int i = 0; i < count; i++) {
+                likedFilms.add(sortFilm.get(i));
+            }
+        }
+        return likedFilms;
     }
 
 }
