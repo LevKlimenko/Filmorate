@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 /**
  * Создайте FilmService, который будет отвечать за операции с фильмами,
@@ -23,16 +24,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     //InMemoryFilmStorage filmStorage = new InMemoryFilmStorage();
-    private Set<Film> compareFilm = new TreeSet<>((o1, o2) -> {
-        if (o1.getLikesId().size() > o2.getLikesId().size()) {
-            return 1;
-        }
-        if (o1.getLikesId().size() == o2.getLikesId().size()) {
-            return 0;
-        } else {
-            return -1;
-        }
-    });
+
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -44,25 +36,31 @@ public class FilmService {
         Film film = filmStorage.findFilmById(filmId);
         if (userStorage.getUsers().containsKey(userId)) {
             film.getLikesId().add(userId);
-            compareFilm.add(filmStorage.getFilms().get(filmId));
+            filmStorage.getCompareFilm().add(filmStorage.getFilms().get(filmId));
         } else {
             throw new UserNullException("Пользователя не существует");
         }
     }
 
-    public void deleteLike(User user, Film film) {
-        film.getLikesId().remove(user.getId());
-        compareFilm.remove(film);
-    }
-
-    public List<String> showMostLikedFilms(int count) {
-        ArrayList<Film> sortFilm = new ArrayList<>(compareFilm);
-        List<String> tenLikedFilms = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            tenLikedFilms.add(sortFilm.get(i).getName());
+    public void deleteLike(int filmId, int userId) {
+        Film film = filmStorage.findFilmById(filmId);
+        if (userStorage.getUsers().containsKey(userId)) {
+            film.getLikesId().remove(userId);
+            filmStorage.getCompareFilm().add(filmStorage.getFilms().get(filmId));
+        } else {
+            throw new UserNullException("Пользователя не существует");
         }
-        return tenLikedFilms;
     }
 
+    public List<Film> showMostLikedFilms(Integer count) {
+       /* ArrayList<Film> sortFilm = new ArrayList<>(compareFilm);
+        List<Film> likedFilms = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            likedFilms.add(sortFilm.get(i));
+        }*/
+        return filmStorage.getCompareFilm().stream()
+                .limit(count)
+                .collect(Collectors.toList());
+    }
 
 }

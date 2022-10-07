@@ -15,6 +15,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 /**     (С помощью аннотации @PathVariable добавьте возможность получать
         каждый фильм и данные о пользователях по их уникальному идентификатору: GET .../users/{id}.
@@ -66,10 +67,28 @@ public class FilmController {
 
     @PutMapping("/{filmId}/like/{userId}")
     @ExceptionHandler
-    public Film likeFilmByUser(@PathVariable("filmId") Integer filmId,
+    public Film addLikeFilmByUser(@PathVariable("filmId") Integer filmId,
                                @PathVariable("userId") Integer userId){
         filmService.addLike(filmId,userId);
         return filmStorage.getFilms().get(filmId);
+    }
+
+    @DeleteMapping("/{filmId}/like/{userId}")
+    @ExceptionHandler
+    public Film deleteLikeByUser(@PathVariable("filmId") Integer filmId,
+                                 @PathVariable("userId") Integer userId){
+        filmService.deleteLike(filmId,userId);
+        return filmStorage.getFilms().get(filmId);
+    }
+    @GetMapping("/popular")
+    @ExceptionHandler
+    public List<Film> getMostPopularFilm(
+            @RequestParam (defaultValue = "10", required = false) String count){
+        int filmCount=Integer.parseInt(count);
+        if( filmCount <=0){
+            throw new IllegalStateException("Ошибка ввода");
+        }
+        return  filmService.showMostLikedFilms(filmCount);
     }
 
 
