@@ -30,7 +30,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
    // @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
+    public User createUser(@Valid User user) {
         checkSpaceInLogin(user);
         checkAlreadyExistUser(user);
         checkValidateName(user);
@@ -46,7 +46,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
    // @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User updateUser(@Valid User user) {
         if (user.getId() == null) {
             throw new UserWithoutIdException("Нельзя обновить пользователя, если не указан ID");
         }
@@ -74,8 +74,13 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     private void checkValidateName(User user) {
-        if (user.getName() == null || user.getLogin().isBlank())
-            user.setName(user.getLogin());
+        if (user.getLogin()!=null || !user.getLogin().isBlank()) {
+            if (user.getName() == null || user.getName().isBlank())
+                user.setName(user.getLogin());
+        }
+        else {
+            throw new UserBadLoginException("Логин не может быть пустым");
+        }
     }
 
     private void checkAlreadyExistUser(User user) {

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.Map;
 
 
  **/
+@Validated
 @RestController
 @RequestMapping("/films")
 public class FilmController {
@@ -46,37 +49,34 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        return filmService.getAllFilms();
     }
 
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) {
-      return filmStorage.addFilm(film);
+    public Film addFilm(@RequestBody Film film) {
+      return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
-       return filmStorage.updateFilm(film);
+    public Film updateFilm(@RequestBody Film film) {
+       return filmService.updateFilm(film);
     }
 
     @GetMapping("/{filmId}")
-    @ExceptionHandler
-    public Film findFilm(@PathVariable("filmId") Integer filmId){
-        return filmStorage.findFilmById(filmId);
+    public Film findFilm(@PathVariable("filmId")@Min(1) Integer filmId){
+        return filmService.findFilmById(filmId);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    @ExceptionHandler
-    public Film addLikeFilmByUser(@PathVariable("filmId") Integer filmId,
-                               @PathVariable("userId") Integer userId){
+    public Film addLikeFilmByUser(@PathVariable("filmId")@Min(1) Integer filmId,
+                               @PathVariable("userId")@Min(1) Integer userId){
         filmService.addLike(filmId,userId);
         return filmStorage.getFilms().get(filmId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    @ExceptionHandler
-    public Film deleteLikeByUser(@PathVariable("filmId") Integer filmId,
-                                 @PathVariable("userId") Integer userId){
+    public Film deleteLikeByUser(@PathVariable("filmId")@Min(1) Integer filmId,
+                                 @PathVariable("userId")@Min(1) Integer userId){
         filmService.deleteLike(filmId,userId);
         return filmStorage.getFilms().get(filmId);
     }

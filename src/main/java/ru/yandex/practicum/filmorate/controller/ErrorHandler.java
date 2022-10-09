@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
 
+import javax.validation.ValidationException;
+
 
 @RestControllerAdvice
 public class ErrorHandler {
@@ -41,6 +43,12 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleValidation(final ValidationException e){
+        return new ErrorResponse(e.getMessage());
+    }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e){

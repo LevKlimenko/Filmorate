@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmNotF
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -16,7 +17,6 @@ import java.util.*;
 public class InMemoryFilmStorage implements FilmStorage {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private static final LocalDate MIN_DATE_FOR_RELEASE = LocalDate.of(1895, 12, 28);
     private final Map<Integer, Film> films = new HashMap<>();
     private int id;
     private FilmService filmService;
@@ -43,7 +43,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     // @PostMapping
-    public Film addFilm(Film film) {
+    public Film addFilm(@Valid Film film) {
         ++id;
         film.setId(id);
         films.put(film.getId(), film);
@@ -54,10 +54,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     //  @PutMapping
-    public Film updateFilm(Film film) {
+    public Film updateFilm(@Valid Film film) {
         if (!films.containsKey(film.getId())) {
             throw new FilmIdException("Фильма с ID=" + film.getId() + " в базе нет");
         }
+        compareFilm.remove(film);
         films.put(film.getId(), film);
         compareFilm.add(film);
         log.info("Фильм {} обновлен", film.getName());
