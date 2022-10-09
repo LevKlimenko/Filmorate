@@ -34,8 +34,7 @@ public class UserController {
 
     @Autowired
     public UserController(UserStorage userStorage, UserService userService) {
-
-        this.userService = userService;
+       this.userService = userService;
     }
 
 
@@ -55,32 +54,32 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User findUser(@PathVariable("userId")@Min(1) Integer userId) {
+    public User findUser(@PathVariable("userId") Integer userId) {
         return userService.findUserById(userId);
     }
 
     @PutMapping("/{user1}/friends/{user2}")
-    public User addFriends(@PathVariable("user1")@Min(1) Integer userId1,
-                           @PathVariable("user2")@Min(1) Integer userId2) {
+    public User addFriends(@PathVariable("user1") Integer userId1,
+                           @PathVariable("user2") Integer userId2) {
         userService.becomeFriend(userId1, userId2);
         return userService.getUsers().get(userId1);
     }
 
     @DeleteMapping("/{user1}/friends/{user2}")
-    public User deleteFriends(@PathVariable("user1")@Min(1) Integer userId1,
-                              @PathVariable("user2")@Min(1) Integer userId2) {
+    public User deleteFriends(@PathVariable("user1") Integer userId1,
+                              @PathVariable("user2") Integer userId2) {
         userService.stopBeingFriends(userId1, userId2);
         return userService.getUsers().get(userId1);
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> showUserFriends(@PathVariable("id")@Min(1) Integer userId) {
+    public Set<User> showUserFriends(@PathVariable("id") Integer userId) {
         return userService.showAllUserFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<User> showIntersectionFriends(@PathVariable("id")@Min(1) Integer userId1,
-                                              @PathVariable("otherId")@Min(1) Integer userId2) {
+    public Set<User> showIntersectionFriends(@PathVariable("id") Integer userId1,
+                                              @PathVariable("otherId") Integer userId2) {
         return userService.showIntersectionFriends(userId1, userId2);
     }
 

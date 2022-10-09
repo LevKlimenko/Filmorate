@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
+import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserIdException;
 import ru.yandex.practicum.filmorate.exceptions.userServiceException.UserNullException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
@@ -58,13 +60,17 @@ public class FilmService {
     }
 
     public void deleteLike(int filmId, int userId) {
-        Film film = filmStorage.findFilmById(filmId);
-        if (userStorage.getUsers().containsKey(userId)) {
-            filmStorage.getCompareFilm().remove(filmStorage.getFilms().get(filmId));
-            film.getLikesId().remove(userId);
-            filmStorage.getCompareFilm().add(filmStorage.getFilms().get(filmId));
-        } else {
-            throw new UserNullException("Пользователя не существует");
+        if (filmStorage.getFilms().containsKey(filmId)) {
+            Film film = filmStorage.findFilmById(filmId);
+            if (userStorage.getUsers().containsKey(userId)) {
+                filmStorage.getCompareFilm().remove(filmStorage.getFilms().get(filmId));
+                film.getLikesId().remove(userId);
+                filmStorage.getCompareFilm().add(filmStorage.getFilms().get(filmId));
+            } else {
+                throw new UserIdException("Пользователя не существует");
+            }
+        }else {
+            throw new FilmIdException(String.format("Фильма с id=%d не существует", filmId));
         }
     }
 

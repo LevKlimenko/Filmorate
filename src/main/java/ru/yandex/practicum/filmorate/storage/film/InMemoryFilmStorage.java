@@ -43,7 +43,7 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     // @PostMapping
-    public Film addFilm(@Valid Film film) {
+    public Film addFilm(Film film) {
         ++id;
         film.setId(id);
         films.put(film.getId(), film);
@@ -54,9 +54,9 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     //  @PutMapping
-    public Film updateFilm(@Valid Film film) {
+    public Film updateFilm( Film film) {
         if (!films.containsKey(film.getId())) {
-            throw new FilmIdException("Фильма с ID=" + film.getId() + " в базе нет");
+            throw new FilmNotFoundExceptin("Фильма с ID=" + film.getId() + " в базе нет");
         }
         compareFilm.remove(film);
         films.put(film.getId(), film);

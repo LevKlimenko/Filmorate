@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.controller.UserController;
@@ -30,7 +31,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
    // @PostMapping
-    public User createUser(@Valid User user) {
+    public User createUser(User user) {
         checkSpaceInLogin(user);
         checkAlreadyExistUser(user);
         checkValidateName(user);
@@ -46,7 +47,7 @@ public class InMemoryUserStorage implements UserStorage{
 
     @Override
    // @PutMapping
-    public User updateUser(@Valid User user) {
+    public User updateUser(User user) {
         if (user.getId() == null) {
             throw new UserWithoutIdException("Нельзя обновить пользователя, если не указан ID");
         }

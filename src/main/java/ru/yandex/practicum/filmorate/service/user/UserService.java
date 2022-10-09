@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserIdException;
 import ru.yandex.practicum.filmorate.exceptions.userServiceException.UserNullException;
 import ru.yandex.practicum.filmorate.exceptions.userServiceException.UsersAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -52,7 +53,7 @@ public class UserService {
                 throw new RuntimeException("Необходимо указать разных пользователей");
             }
         } else {
-            throw new UserNullException("Нельзя задать несуществующего пользователя");
+            throw new UserIdException("Нельзя задать несуществующего пользователя");
         }
     }
 
@@ -71,7 +72,7 @@ public class UserService {
                 throw new RuntimeException("Необходимо указать разных пользователей");
             }
         } else {
-            throw new UserNullException("Нельзя задать несуществующего пользователя");
+            throw new UserIdException("Нельзя задать несуществующего пользователя");
         }
     }
 

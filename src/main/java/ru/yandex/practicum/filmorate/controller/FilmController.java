@@ -53,35 +53,34 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film addFilm(@RequestBody Film film) {
+    public Film addFilm(@Valid @RequestBody Film film) {
       return filmService.addFilm(film);
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
        return filmService.updateFilm(film);
     }
 
     @GetMapping("/{filmId}")
-    public Film findFilm(@PathVariable("filmId")@Min(1) Integer filmId){
+    public Film findFilm(@PathVariable("filmId") Integer filmId){
         return filmService.findFilmById(filmId);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public Film addLikeFilmByUser(@PathVariable("filmId")@Min(1) Integer filmId,
-                               @PathVariable("userId")@Min(1) Integer userId){
+    public Film addLikeFilmByUser(@PathVariable("filmId") Integer filmId,
+                               @PathVariable("userId") Integer userId){
         filmService.addLike(filmId,userId);
         return filmStorage.getFilms().get(filmId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film deleteLikeByUser(@PathVariable("filmId")@Min(1) Integer filmId,
-                                 @PathVariable("userId")@Min(1) Integer userId){
+    public Film deleteLikeByUser(@PathVariable("filmId") Integer filmId,
+                                 @PathVariable("userId") Integer userId){
         filmService.deleteLike(filmId,userId);
         return filmStorage.getFilms().get(filmId);
     }
     @GetMapping("/popular")
-    @ExceptionHandler
     public List<Film> getMostPopularFilm(
             @RequestParam (defaultValue = "10", required = false) String count){
         int filmCount=Integer.parseInt(count);
