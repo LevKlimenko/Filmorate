@@ -5,44 +5,39 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmNotFoundExceptin;
+import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
 
-import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.*;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, Film> films = new HashMap<>();
-    private int id;
-    private FilmService filmService;
+    private final Map<Long, Film> films = new HashMap<>();
+    private long id;
     private Set<Film> compareFilm = new TreeSet<>((o1, o2) -> {
         if (o1.getLikesId().size() < o2.getLikesId().size()) {
             return 1;
         }
         if (o1.getLikesId().size() == o2.getLikesId().size()) {
-            return o1.getId()-o2.getId();
+            return (int) (o1.getId() - o2.getId());
         } else {
             return -1;
         }
     });
-@Override
+
+    @Override
     public Set<Film> getCompareFilm() {
         return compareFilm;
     }
 
     @Override
-    // @GetMapping
     public Collection<Film> getAllFilms() {
         return films.values();
     }
 
     @Override
-    // @PostMapping
     public Film addFilm(Film film) {
         ++id;
         film.setId(id);
@@ -53,28 +48,31 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    //  @PutMapping
-    public Film updateFilm( Film film) {
-        if (!films.containsKey(film.getId())) {
-            throw new FilmNotFoundExceptin("Фильма с ID=" + film.getId() + " в базе нет");
+    public Film updateFilm(Film film) {
+        if (film.getId() > 0) {
+            if (!films.containsKey(film.getId())) {
+                throw new FilmNotFoundException(String.format("Фильма с ID=%d в базе нет", film.getId()));
+            }
+            compareFilm.remove(film);
+            films.put(film.getId(), film);
+            compareFilm.add(film);
+            log.info("Фильм {} обновлен", film.getName());
+            return film;
+        } else {
+            throw new FilmIdException("Для обновления фильма значение ID должно быть больше 0");
         }
-        compareFilm.remove(film);
-        films.put(film.getId(), film);
-        compareFilm.add(film);
-        log.info("Фильм {} обновлен", film.getName());
-        return film;
     }
 
     @Override
-    public Film findFilmById(Integer filmId) {
+    public Film findFilmById(Long filmId) {
         if (!films.containsKey(filmId)) {
-            throw new FilmNotFoundExceptin(String.format("Фильм № %d не найден", filmId));
+            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
         }
         return films.get(filmId);
     }
 
     @Override
-    public Map<Integer, Film> getFilms() {
+    public Map<Long, Film> getFilms() {
         return films;
     }
 

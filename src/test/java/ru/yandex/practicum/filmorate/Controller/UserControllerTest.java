@@ -92,7 +92,7 @@ public class UserControllerTest {
                 .build();
         uc.createUser(user);
         User user2 = User.builder()
-                .id(2)
+                .id((long) 2)
                 .email("testUserUpdate@yandex.ru")
                 .login("testLogin")
                 .name("testNameUpdate")
@@ -111,7 +111,7 @@ public class UserControllerTest {
                 .build();
         uc.createUser(user);
         User user2 = User.builder()
-                .id(2)
+                .id((long) 2)
                 .email("testUser@yandex.ru")
                 .login("testLoginUpdate")
                 .name("testNameUpdate")
@@ -174,14 +174,14 @@ public class UserControllerTest {
                 .build();
         uc.createUser(user);
         User user2 = User.builder()
-                .id(-1)
+                .id((long) -1)
                 .email("testUserUpdate@yandex.ru")
                 .login("testLoginUpdate")
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         User user3 = User.builder()
-                .id(5)
+                .id((long) 5)
                 .email("testUserUpdate@yandex.ru")
                 .login("testLoginUpdate")
                 .name("testNameUpdate")

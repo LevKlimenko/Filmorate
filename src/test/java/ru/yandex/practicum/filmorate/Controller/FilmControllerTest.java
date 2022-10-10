@@ -62,7 +62,7 @@ public class FilmControllerTest {
     @Test
     public void putNormalFilm() {
         film = Film.builder()
-                .id(1)
+                .id((long) 1)
                 .name("testFilm")
                 .description("testFilm")
                 .releaseDate(LocalDate.of(2022, 5, 5))
@@ -70,7 +70,7 @@ public class FilmControllerTest {
                 .build();
         fs.addFilm(film);
         Film film2 = Film.builder()
-                .id(1)
+                .id((long) 1)
                 .name("testFilm")
                 .description("testAlreadyExistFilm")
                 .releaseDate(LocalDate.of(2022, 1, 1))

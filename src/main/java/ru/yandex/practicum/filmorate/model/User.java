@@ -14,7 +14,7 @@ import java.util.Set;
 @Data
 @Builder
 public class User {
-    private Integer id;
+    private Long id;
     @NotNull
     @Email(message = "Введите действительный E-mail")
     private final String email;
@@ -24,5 +24,5 @@ public class User {
     @NotNull
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
-    private final Set<Integer> friends = new HashSet<>();
+    private final Set<Long> friendsId = new HashSet<>();
 }

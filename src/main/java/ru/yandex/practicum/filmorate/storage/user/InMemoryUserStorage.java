@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestBody;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserBadLoginException;
@@ -12,25 +10,22 @@ import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserIdEx
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserWithoutIdException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.Valid;
 import java.util.*;
 
 @Component
-public class InMemoryUserStorage implements UserStorage{
+public class InMemoryUserStorage implements UserStorage {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
-    private final Map<Integer, User> users = new HashMap<>();
+    private final Map<Long, User> users = new HashMap<>();
     private final Set<String> usersEmailInBase = new HashSet<>();
     private final Set<String> usersLoginInBase = new HashSet<>();
-    private int generatorId;
+    private long generatorId;
 
     @Override
-   // @GetMapping
     public Collection<User> getAllUser() {
         return users.values();
     }
 
     @Override
-   // @PostMapping
     public User createUser(User user) {
         checkSpaceInLogin(user);
         checkAlreadyExistUser(user);
@@ -46,7 +41,6 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-   // @PutMapping
     public User updateUser(User user) {
         if (user.getId() == null) {
             throw new UserWithoutIdException("Нельзя обновить пользователя, если не указан ID");
@@ -62,9 +56,9 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public User findUserById(Integer userId) {
-        if (!users.containsKey(userId)){
-            throw new UserIdException(String.format("Пользователь № %d не найден", userId ));
+    public User findUserById(Long userId) {
+        if (!users.containsKey(userId)) {
+            throw new UserIdException(String.format("Пользователь № %d не найден", userId));
         }
         return users.get(userId);
     }
@@ -75,11 +69,10 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     private void checkValidateName(User user) {
-        if (user.getLogin()!=null || !user.getLogin().isBlank()) {
+        if (user.getLogin() != null || !user.getLogin().isBlank()) {
             if (user.getName() == null || user.getName().isBlank())
                 user.setName(user.getLogin());
-        }
-        else {
+        } else {
             throw new UserBadLoginException("Логин не может быть пустым");
         }
     }
@@ -95,7 +88,7 @@ public class InMemoryUserStorage implements UserStorage{
     }
 
     @Override
-    public Map<Integer, User> getUsers() {
+    public Map<Long, User> getUsers() {
         return new HashMap<>(users);
     }
 

@@ -9,10 +9,14 @@ import java.util.Set;
 public interface FilmStorage {
     Set<Film> getCompareFilm();
 
-    public Collection<Film> getAllFilms();
-    public Film addFilm(Film film);
-    public Film updateFilm(Film film);
-    public Film findFilmById(Integer filmId);
-    public Map<Integer,Film> getFilms();
+    Collection<Film> getAllFilms();
+
+    Film addFilm(Film film);
+
+    Film updateFilm(Film film);
+
+    Film findFilmById(Long filmId);
+
+    Map<Long, Film> getFilms();
 
 }
