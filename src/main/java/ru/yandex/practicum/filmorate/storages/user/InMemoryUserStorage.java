@@ -1,14 +1,14 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storages.user;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.controllers.UserController;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserBadLoginException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserIdException;
 import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserWithoutIdException;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.models.User;
 
 import java.util.*;
 
@@ -21,12 +21,12 @@ public class InMemoryUserStorage implements UserStorage {
     private long generatorId;
 
     @Override
-    public Collection<User> getAllUser() {
+    public Collection<User> getUser() {
         return users.values();
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         checkSpaceInLogin(user);
         checkAlreadyExistUser(user);
         checkValidateName(user);
@@ -41,12 +41,12 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         if (user.getId() == null) {
             throw new UserWithoutIdException("Нельзя обновить пользователя, если не указан ID");
         }
         if (!users.containsKey(user.getId())) {
-            throw new UserIdException("Нет пользователя с ID=" + user.getId());
+            throw new NotFoundException("Нет пользователя с ID=" + user.getId());
         }
         checkSpaceInLogin(user);
         checkValidateName(user);
@@ -56,9 +56,9 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User findUserById(Long userId) {
+    public User findById(Long userId) {
         if (!users.containsKey(userId)) {
-            throw new UserIdException(String.format("Пользователь № %d не найден", userId));
+            throw new NotFoundException(String.format("Пользователь № %d не найден", userId));
         }
         return users.get(userId);
     }
@@ -88,13 +88,18 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getUsers() {
+    public Map<Long, User> getMap() {
         return new HashMap<>(users);
     }
 
     @Override
     public long getGeneratorId() {
         return generatorId;
+    }
+
+    @Override
+    public Set<Long> getAllId(){
+        return users.keySet();
     }
 
 

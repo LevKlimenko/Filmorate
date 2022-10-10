@@ -1,12 +1,12 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storages.film;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.controllers.UserController;
 import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmNotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
+import ru.yandex.practicum.filmorate.models.Film;
 
 import java.util.*;
 
@@ -28,17 +28,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     });
 
     @Override
-    public Set<Film> getCompareFilm() {
+    public Set<Film> getCompare() {
         return compareFilm;
     }
 
     @Override
-    public Collection<Film> getAllFilms() {
+    public Collection<Film> getAll() {
         return films.values();
     }
 
     @Override
-    public Film addFilm(Film film) {
+    public Film add(Film film) {
         ++id;
         film.setId(id);
         films.put(film.getId(), film);
@@ -48,10 +48,10 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film updateFilm(Film film) {
+    public Film update(Film film) {
         if (film.getId() > 0) {
             if (!films.containsKey(film.getId())) {
-                throw new FilmNotFoundException(String.format("Фильма с ID=%d в базе нет", film.getId()));
+                throw new NotFoundException(String.format("Фильма с ID=%d в базе нет", film.getId()));
             }
             compareFilm.remove(film);
             films.put(film.getId(), film);
@@ -64,17 +64,21 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Film findFilmById(Long filmId) {
+    public Film findById(Long filmId) {
         if (!films.containsKey(filmId)) {
-            throw new FilmNotFoundException(String.format("Фильм № %d не найден", filmId));
+            throw new NotFoundException(String.format("Фильм № %d не найден", filmId));
         }
         return films.get(filmId);
     }
 
     @Override
-    public Map<Long, Film> getFilms() {
+    public Map<Long, Film> getMap() {
         return films;
     }
 
+    @Override
+    public Set<Long> getAllId() {
+        return films.keySet();
+    }
 
 }

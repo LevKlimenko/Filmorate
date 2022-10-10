@@ -1,12 +1,15 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.services.film.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 import java.util.List;
 
@@ -25,22 +28,22 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> getAllFilms() {
-        return filmService.getAllFilms();
+        return filmService.getAll();
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        return filmService.addFilm(film);
+        return filmService.add(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        return filmService.updateFilm(film);
+        return filmService.update(film);
     }
 
     @GetMapping("/{filmId}")
-    public Film findFilm(@PathVariable("filmId") Long filmId) {
-        return filmService.findFilmById(filmId);
+    public Film findFilm(@PathVariable("filmId")Long filmId) {
+        return filmService.findById(filmId);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
@@ -51,20 +54,24 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film deleteLikeByUser(@PathVariable("filmId") Long filmId,
+    public Film deleteLikeByUser(@PathVariable("filmId")Long filmId,
                                  @PathVariable("userId") Long userId) {
         filmService.deleteLike(filmId, userId);
         return filmService.getFilms().get(filmId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilm(
-            @RequestParam(defaultValue = "10", required = false) String count) {
-        int filmCount = Integer.parseInt(count);
-        if (filmCount <= 0) {
-            throw new IllegalStateException("Ошибка ввода");
+    public List<Film> getMostPopularFilm(@RequestParam(defaultValue = "10", required = false) String count) {
+        try{
+            int filmCount = Integer.parseInt(count);
+            if(filmCount<0){
+                filmCount=10;
+            }
+            return filmService.showMostLikedFilms(filmCount);
+        } catch (NumberFormatException e) {
+            e.getMessage();
         }
-        return filmService.showMostLikedFilms(filmCount);
+        return filmService.showMostLikedFilms(10);
     }
 
 

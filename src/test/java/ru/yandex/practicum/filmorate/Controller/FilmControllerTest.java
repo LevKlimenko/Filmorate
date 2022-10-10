@@ -2,10 +2,8 @@ package ru.yandex.practicum.filmorate.Controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmReleaseDateException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.film.InMemoryFilmStorage;
+import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.storages.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -32,8 +30,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.addFilm(film);
-        assertEquals(1, fs.getAllFilms().size(), "Количество фильмов не совпадает");
+        fs.add(film);
+        assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
     @Test
@@ -44,15 +42,15 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.addFilm(film);
+        fs.add(film);
         Film film2 = Film.builder()
                 .name("testFilm2")
                 .description("testFilm2")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fs.addFilm(film2);
-        assertEquals(2, fs.getAllFilms().size(), "Количество фильмов не совпадает");
+        fs.add(film2);
+        assertEquals(2, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
     /**
@@ -68,7 +66,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.addFilm(film);
+        fs.add(film);
         Film film2 = Film.builder()
                 .id((long) 1)
                 .name("testFilm")
@@ -76,8 +74,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fs.updateFilm(film2);
-        assertEquals(1, fs.getAllFilms().size(), "Количество фильмов не совпадает");
+        fs.update(film2);
+        assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
 }

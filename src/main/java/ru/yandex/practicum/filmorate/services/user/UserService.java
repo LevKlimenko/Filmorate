@@ -1,11 +1,11 @@
-package ru.yandex.practicum.filmorate.service.user;
+package ru.yandex.practicum.filmorate.services.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserIdException;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.userServiceException.UsersAlreadyFriendsException;
-import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
+import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -21,26 +21,26 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
-    public Collection<User> getAllUser() {
-        return userStorage.getAllUser();
+    public Collection<User> getAll() {
+        return userStorage.getUser();
     }
 
-    public User createUser(User user) {
-        return userStorage.createUser(user);
+    public User create(User user) {
+        return userStorage.create(user);
     }
 
-    public User updateUser(User user) {
-        return userStorage.updateUser(user);
+    public User update(User user) {
+        return userStorage.update(user);
     }
 
-    public User findUserById(Long userId) {
-        return userStorage.findUserById(userId);
+    public User findById(Long userId) {
+        return userStorage.findById(userId);
     }
 
     public void becomeFriend(Long userId1, Long userId2) {
-        if (userStorage.getUsers().get(userId1) != null && userStorage.getUsers().get(userId2) != null) {
-            User user1 = userStorage.getUsers().get(userId1);
-            User user2 = userStorage.getUsers().get(userId2);
+        if (userStorage.getAllId().contains(userId1) && userStorage.getAllId().contains(userId2)) {
+            User user1 = userStorage.getMap().get(userId1);
+            User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
                 if (!user1.getFriendsId().contains(user2.getId())) {
                     user1.getFriendsId().add(user2.getId());
@@ -52,14 +52,14 @@ public class UserService {
                 throw new RuntimeException("Необходимо указать разных пользователей");
             }
         } else {
-            throw new UserIdException("Нельзя задать несуществующего пользователя");
+            throw new NotFoundException("Нельзя задать несуществующего пользователя");
         }
     }
 
     public void stopBeingFriends(Long userId1, Long userId2) {
-        if (userStorage.getUsers().get(userId1) != null && userStorage.getUsers().get(userId2) != null) {
-            User user1 = userStorage.getUsers().get(userId1);
-            User user2 = userStorage.getUsers().get(userId2);
+        if (userStorage.getAllId().contains(userId1) && userStorage.getAllId().contains(userId2)) {
+            User user1 = userStorage.getMap().get(userId1);
+            User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
                 if (user1.getFriendsId().contains(user2.getId())) {
                     user1.getFriendsId().remove(user2.getId());
@@ -71,31 +71,31 @@ public class UserService {
                 throw new RuntimeException("Необходимо указать разных пользователей");
             }
         } else {
-            throw new UserIdException("Нельзя задать несуществующего пользователя");
+            throw new NotFoundException("Нельзя задать несуществующего пользователя");
         }
     }
 
     public Set<User> showAllUserFriends(Long userId) {
         Set<User> friends = new HashSet<>();
-        for (Long id : userStorage.getUsers().get(userId).getFriendsId()) {
-            friends.add(userStorage.getUsers().get(id));
+        for (Long id : userStorage.getMap().get(userId).getFriendsId()) {
+            friends.add(userStorage.getMap().get(id));
         }
         return friends;
     }
 
     public Set<User> showIntersectionFriends(Long userId1, Long userId2) {
-        User user1 = userStorage.getUsers().get(userId1);
-        User user2 = userStorage.getUsers().get(userId2);
+        User user1 = userStorage.getMap().get(userId1);
+        User user2 = userStorage.getMap().get(userId2);
         Set<Long> interFriendsId = new HashSet<>(user1.getFriendsId());
         Set<User> interFriends = new HashSet<>();
         interFriendsId.retainAll(user2.getFriendsId());
         for (Long id : interFriendsId) {
-            interFriends.add(userStorage.getUsers().get(id));
+            interFriends.add(userStorage.getMap().get(id));
         }
         return interFriends;
     }
 
     public Map<Long, User> getUsers() {
-        return userStorage.getUsers();
+        return userStorage.getMap();
     }
 }
