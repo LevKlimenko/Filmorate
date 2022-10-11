@@ -29,7 +29,7 @@ public class FilmController {
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
-        return filmService.add(film);
+        return filmService.create(film);
     }
 
     @PutMapping

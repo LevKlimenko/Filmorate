@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.exceptions.errorHandler;
+package ru.yandex.practicum.filmorate.exceptions.errorhandler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;

@@ -11,7 +11,7 @@ public interface FilmStorage {
 
     Collection<Film> getAll();
 
-    Film add(Film film);
+    Film create(Film film);
 
     Film update(Film film);
 

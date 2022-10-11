@@ -30,7 +30,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.add(film);
+        fs.create(film);
         assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
@@ -42,14 +42,14 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.add(film);
+        fs.create(film);
         Film film2 = Film.builder()
                 .name("testFilm2")
                 .description("testFilm2")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fs.add(film2);
+        fs.create(film2);
         assertEquals(2, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
@@ -66,7 +66,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.add(film);
+        fs.create(film);
         Film film2 = Film.builder()
                 .id((long) 1)
                 .name("testFilm")
