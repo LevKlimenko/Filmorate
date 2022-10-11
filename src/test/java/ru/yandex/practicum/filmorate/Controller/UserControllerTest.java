@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.Controller;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
+import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storages.user.InMemoryUserStorage;
@@ -93,7 +94,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.now())
                 .build();
-        assertThrows(BadRequestException.class, () -> uc.create(user2), "Пользователь добавлен");
+        assertThrows(ConflictException.class, () -> uc.create(user2), "Пользователь добавлен");
     }
 
     @Test
@@ -112,7 +113,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.now())
                 .build();
-        assertThrows(BadRequestException.class, () -> uc.create(user2), "Пользователь добавлен");
+        assertThrows(ConflictException.class, () -> uc.create(user2), "Пользователь добавлен");
     }
 
 
