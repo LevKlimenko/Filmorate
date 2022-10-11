@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.services.film;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
@@ -14,6 +17,7 @@ import java.util.Map;
 
 @Service
 public class FilmService {
+    private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
@@ -43,9 +47,10 @@ public class FilmService {
         if (filmStorage.isExist(filmId)) {
             Film film = filmStorage.findById(filmId);
             if (userStorage.isExist(userId)) {
-                filmStorage.getCompare().remove(filmStorage.getMap().get(filmId));
+                filmStorage.getCompare().remove(filmStorage.findById(filmId));
                 film.getLikesId().add(userId);
-                filmStorage.getCompare().add(filmStorage.getMap().get(filmId));
+                log.debug("Пользователь с id {} добавил лайк к фильму с id {}.", userId, filmId);
+                filmStorage.getCompare().add(filmStorage.findById(filmId));
             } else {
                 throw new NotFoundException("Пользователя не существует");
             }
@@ -56,9 +61,10 @@ public class FilmService {
         if (filmStorage.isExist(filmId)) {
             Film film = filmStorage.findById(filmId);
             if (userStorage.isExist(userId)) {
-                filmStorage.getCompare().remove(filmStorage.getMap().get(filmId));
+                filmStorage.getCompare().remove(filmStorage.findById(filmId));
                 film.getLikesId().remove(userId);
-                filmStorage.getCompare().add(filmStorage.getMap().get(filmId));
+                log.debug("Пользователь с id {} удалил лайк с фильма с id {}.", userId, filmId);
+                filmStorage.getCompare().add(filmStorage.findById(filmId));
             } else {
                 throw new NotFoundException("Пользователя не существует");
             }
