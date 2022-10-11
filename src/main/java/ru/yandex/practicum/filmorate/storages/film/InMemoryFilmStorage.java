@@ -78,6 +78,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public boolean isExist(Long id) {
-        return getMap().containsKey(id);
+        return films.containsKey(id);
     }
 }

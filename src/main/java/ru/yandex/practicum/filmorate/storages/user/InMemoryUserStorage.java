@@ -98,6 +98,6 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public boolean isExist(Long id) {
-        return getMap().containsKey(id);
+        return users.containsKey(id);
     }
 }
