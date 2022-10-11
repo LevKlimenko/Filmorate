@@ -2,10 +2,8 @@ package ru.yandex.practicum.filmorate.Controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserBadLoginException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserWithoutIdException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storages.user.InMemoryUserStorage;
 
@@ -20,7 +18,6 @@ public class UserControllerTest {
     User user;
 
     InMemoryUserStorage uc = new InMemoryUserStorage();
-
 
     /**
      * Test POST
@@ -66,7 +63,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(UserBadLoginException.class, () -> uc.create(user), "Добавлен пользователь " + user.getLogin());
+        assertThrows(BadRequestException.class, () -> uc.create(user), "Добавлен пользователь " + user.getLogin());
     }
 
     @Test
@@ -96,7 +93,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.now())
                 .build();
-        assertThrows(UserAlreadyExistException.class, () -> uc.create(user2), "Пользователь добавлен");
+        assertThrows(BadRequestException.class, () -> uc.create(user2), "Пользователь добавлен");
     }
 
     @Test
@@ -115,7 +112,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.now())
                 .build();
-        assertThrows(UserAlreadyExistException.class, () -> uc.create(user2), "Пользователь добавлен");
+        assertThrows(BadRequestException.class, () -> uc.create(user2), "Пользователь добавлен");
     }
 
 
@@ -159,7 +156,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(UserWithoutIdException.class, () -> uc.update(user2), "Пользователь обновлен");
+        assertThrows(BadRequestException.class, () -> uc.update(user2), "Пользователь обновлен");
     }
 
     @Test
@@ -207,7 +204,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(UserBadLoginException.class, () -> uc.update(user2), "Пользователь c ID=" +
+        assertThrows(BadRequestException.class, () -> uc.update(user2), "Пользователь c ID=" +
                 user2.getId() + " обновлен");
     }
 
@@ -229,5 +226,4 @@ public class UserControllerTest {
         uc.update(user2);
         assertEquals(user2.getLogin(), user2.getName(), "Имя и Логин не совпадают");
     }
-
 }

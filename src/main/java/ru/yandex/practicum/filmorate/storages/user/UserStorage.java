@@ -4,7 +4,6 @@ import ru.yandex.practicum.filmorate.models.User;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 public interface UserStorage {
     Collection<User> getUser();
@@ -19,5 +18,5 @@ public interface UserStorage {
 
     long getGeneratorId();
 
-    Set<Long> getAllId();
+    boolean isExist(Long id);
 }

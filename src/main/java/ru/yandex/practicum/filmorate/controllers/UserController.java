@@ -23,7 +23,6 @@ public class UserController {
         this.userService = userService;
     }
 
-
     @GetMapping
     public Collection<User> getAllUser() {
         return userService.getAll();
@@ -68,7 +67,5 @@ public class UserController {
                                              @PathVariable("otherId") Long userId2) {
         return userService.showIntersectionFriends(userId1, userId2);
     }
-
-
 }
 

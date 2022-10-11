@@ -7,9 +7,6 @@ import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.services.film.FilmService;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,7 +16,6 @@ import java.util.List;
 public class FilmController {
 
     private final FilmService filmService;
-
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -42,7 +38,7 @@ public class FilmController {
     }
 
     @GetMapping("/{filmId}")
-    public Film findFilm(@PathVariable("filmId")Long filmId) {
+    public Film findFilm(@PathVariable("filmId") Long filmId) {
         return filmService.findById(filmId);
     }
 
@@ -54,7 +50,7 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film deleteLikeByUser(@PathVariable("filmId")Long filmId,
+    public Film deleteLikeByUser(@PathVariable("filmId") Long filmId,
                                  @PathVariable("userId") Long userId) {
         filmService.deleteLike(filmId, userId);
         return filmService.getFilms().get(filmId);
@@ -62,10 +58,10 @@ public class FilmController {
 
     @GetMapping("/popular")
     public List<Film> getMostPopularFilm(@RequestParam(defaultValue = "10", required = false) String count) {
-        try{
+        try {
             int filmCount = Integer.parseInt(count);
-            if(filmCount<0){
-                filmCount=10;
+            if (filmCount < 0) {
+                filmCount = 10;
             }
             return filmService.showMostLikedFilms(filmCount);
         } catch (NumberFormatException e) {
@@ -73,6 +69,4 @@ public class FilmController {
         }
         return filmService.showMostLikedFilms(10);
     }
-
-
 }

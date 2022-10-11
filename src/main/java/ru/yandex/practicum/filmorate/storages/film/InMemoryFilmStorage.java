@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controllers.UserController;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmIdException;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 
@@ -59,7 +59,7 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.info("Фильм {} обновлен", film.getName());
             return film;
         } else {
-            throw new FilmIdException("Для обновления фильма значение ID должно быть больше 0");
+            throw new BadRequestException("Для обновления фильма значение ID должно быть больше 0");
         }
     }
 
@@ -77,8 +77,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    public Set<Long> getAllId() {
-        return films.keySet();
+    public boolean isExist(Long id) {
+        return getMap().containsKey(id);
     }
-
 }

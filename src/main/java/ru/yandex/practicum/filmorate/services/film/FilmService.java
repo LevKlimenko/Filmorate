@@ -17,7 +17,6 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
@@ -41,20 +40,22 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        Film film = filmStorage.findById(filmId);
-        if (userStorage.getAllId().contains(userId) ) {
-            filmStorage.getCompare().remove(filmStorage.getMap().get(filmId));
-            film.getLikesId().add(userId);
-            filmStorage.getCompare().add(filmStorage.getMap().get(filmId));
-        } else {
-            throw new NotFoundException("Пользователя не существует");
+        if (filmStorage.isExist(filmId)) {
+            Film film = filmStorage.findById(filmId);
+            if (userStorage.isExist(userId)) {
+                filmStorage.getCompare().remove(filmStorage.getMap().get(filmId));
+                film.getLikesId().add(userId);
+                filmStorage.getCompare().add(filmStorage.getMap().get(filmId));
+            } else {
+                throw new NotFoundException("Пользователя не существует");
+            }
         }
     }
 
     public void deleteLike(Long filmId, Long userId) {
-        if (filmStorage.getAllId().contains(userId)) {
+        if (filmStorage.isExist(filmId)) {
             Film film = filmStorage.findById(filmId);
-            if (userStorage.getAllId().contains(userId)) {
+            if (userStorage.isExist(userId)) {
                 filmStorage.getCompare().remove(filmStorage.getMap().get(filmId));
                 film.getLikesId().remove(userId);
                 filmStorage.getCompare().add(filmStorage.getMap().get(filmId));
@@ -67,7 +68,7 @@ public class FilmService {
     }
 
     public List<Film> showMostLikedFilms(Integer count) {
-        ArrayList<Film> sortFilm = new ArrayList<>(filmStorage.getCompare());
+        List<Film> sortFilm = new ArrayList<>(filmStorage.getCompare());
         List<Film> likedFilms = new ArrayList<>();
         if (count > sortFilm.size()) {
             count = sortFilm.size();
@@ -83,5 +84,4 @@ public class FilmService {
     public Map<Long, Film> getFilms() {
         return filmStorage.getMap();
     }
-
 }

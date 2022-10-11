@@ -4,10 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controllers.UserController;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
+import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserAlreadyExistException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserBadLoginException;
-import ru.yandex.practicum.filmorate.exceptions.UserValidationException.UserWithoutIdException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.util.*;
@@ -43,7 +42,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public User update(User user) {
         if (user.getId() == null) {
-            throw new UserWithoutIdException("Нельзя обновить пользователя, если не указан ID");
+            throw new BadRequestException("Нельзя обновить пользователя, если не указан ID");
         }
         if (!users.containsKey(user.getId())) {
             throw new NotFoundException("Нет пользователя с ID=" + user.getId());
@@ -65,7 +64,7 @@ public class InMemoryUserStorage implements UserStorage {
 
     private void checkSpaceInLogin(User user) {
         if (user.getLogin().contains(" "))
-            throw new UserBadLoginException("Логин не может содержать пробелы");
+            throw new BadRequestException("Логин не может содержать пробелы");
     }
 
     private void checkValidateName(User user) {
@@ -73,17 +72,17 @@ public class InMemoryUserStorage implements UserStorage {
             if (user.getName() == null || user.getName().isBlank())
                 user.setName(user.getLogin());
         } else {
-            throw new UserBadLoginException("Логин не может быть пустым");
+            throw new BadRequestException("Логин не может быть пустым");
         }
     }
 
     private void checkAlreadyExistUser(User user) {
         if (usersEmailInBase.contains(user.getEmail())) {
-            throw new UserAlreadyExistException("Пользователь с электронной почтой " + user.getEmail() +
+            throw new ConflictException("Пользователь с электронной почтой " + user.getEmail() +
                     " уже существует");
         }
         if (usersLoginInBase.contains(user.getLogin())) {
-            throw new UserAlreadyExistException("Пользователь с логином " + user.getLogin() + " уже существует");
+            throw new ConflictException("Пользователь с логином " + user.getLogin() + " уже существует");
         }
     }
 
@@ -98,9 +97,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public Set<Long> getAllId(){
-        return users.keySet();
+    public boolean isExist(Long id) {
+        return getMap().containsKey(id);
     }
-
-
 }

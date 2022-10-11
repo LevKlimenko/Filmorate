@@ -26,5 +26,4 @@ public class Film {
     @PositiveOrZero(message = "Продолжительность должна быть больше или равно 0")
     private int duration;
     private final Set<Long> likesId = new HashSet<>();
-
 }

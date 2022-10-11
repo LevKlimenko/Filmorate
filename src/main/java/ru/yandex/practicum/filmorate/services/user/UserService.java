@@ -2,8 +2,9 @@ package ru.yandex.practicum.filmorate.services.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.exceptions.userServiceException.UsersAlreadyFriendsException;
+import ru.yandex.practicum.filmorate.exceptions.UsersAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
@@ -38,7 +39,7 @@ public class UserService {
     }
 
     public void becomeFriend(Long userId1, Long userId2) {
-        if (userStorage.getAllId().contains(userId1) && userStorage.getAllId().contains(userId2)) {
+        if (userStorage.isExist(userId1) && userStorage.isExist(userId2)) {
             User user1 = userStorage.getMap().get(userId1);
             User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
@@ -57,7 +58,7 @@ public class UserService {
     }
 
     public void stopBeingFriends(Long userId1, Long userId2) {
-        if (userStorage.getAllId().contains(userId1) && userStorage.getAllId().contains(userId2)) {
+        if (userStorage.isExist(userId1) && userStorage.isExist(userId2)) {
             User user1 = userStorage.getMap().get(userId1);
             User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
@@ -65,10 +66,10 @@ public class UserService {
                     user1.getFriendsId().remove(user2.getId());
                     user2.getFriendsId().remove(user1.getId());
                 } else {
-                    throw new UsersAlreadyFriendsException("Пользователей нет в друзьях друг у друга");
+                    throw new BadRequestException("Пользователей нет в друзьях друг у друга");
                 }
             } else {
-                throw new RuntimeException("Необходимо указать разных пользователей");
+                throw new BadRequestException("Необходимо указать разных пользователей");
             }
         } else {
             throw new NotFoundException("Нельзя задать несуществующего пользователя");

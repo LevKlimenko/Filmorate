@@ -19,6 +19,5 @@ public interface FilmStorage {
 
     Map<Long, Film> getMap();
 
-    Set<Long> getAllId();
-
+    boolean isExist(Long id);
 }
