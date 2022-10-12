@@ -2,9 +2,8 @@ package ru.yandex.practicum.filmorate.Controller;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ru.yandex.practicum.filmorate.controller.FilmController;
-import ru.yandex.practicum.filmorate.exceptions.FilmValidationException.FilmReleaseDateException;
-import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.storages.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
 
@@ -15,7 +14,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FilmControllerTest {
     Film film;
 
-    FilmController fc = new FilmController();
+    //FilmController fc = new FilmController();
+    InMemoryFilmStorage fs = new InMemoryFilmStorage();
 
 
     /**
@@ -30,8 +30,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fc.addFilm(film);
-        assertEquals(1, fc.getAllFilms().size(), "Количество фильмов не совпадает");
+        fs.create(film);
+        assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
     @Test
@@ -42,15 +42,15 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fc.addFilm(film);
+        fs.create(film);
         Film film2 = Film.builder()
                 .name("testFilm2")
                 .description("testFilm2")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fc.addFilm(film2);
-        assertEquals(2, fc.getAllFilms().size(), "Количество фильмов не совпадает");
+        fs.create(film2);
+        assertEquals(2, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
     /**
@@ -60,22 +60,22 @@ public class FilmControllerTest {
     @Test
     public void putNormalFilm() {
         film = Film.builder()
-                .id(1)
+                .id((long) 1)
                 .name("testFilm")
                 .description("testFilm")
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fc.addFilm(film);
+        fs.create(film);
         Film film2 = Film.builder()
-                .id(1)
+                .id((long) 1)
                 .name("testFilm")
                 .description("testAlreadyExistFilm")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fc.updateFilm(film2);
-        assertEquals(1, fc.getAllFilms().size(), "Количество фильмов не совпадает");
+        fs.update(film2);
+        assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
     }
 
 }

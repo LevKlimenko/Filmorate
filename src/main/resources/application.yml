@@ -1,0 +1,12 @@
+logging:
+    level:
+        org:
+            zalando:
+                logbook: TRACE
+        ru:
+            yandex:
+                practicum:
+                    contollers: debug
+server:
+    error:
+        include-message: always
