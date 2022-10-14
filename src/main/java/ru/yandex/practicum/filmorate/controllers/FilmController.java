@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.services.film.FilmLike;
 import ru.yandex.practicum.filmorate.services.film.FilmService;
 
 import javax.validation.Valid;
@@ -15,7 +16,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final FilmService filmService;
+    private final FilmLike filmService;
 
     @Autowired
     public FilmController(FilmService filmService) {
@@ -46,24 +47,23 @@ public class FilmController {
     public Film addLikeFilmByUser(@PathVariable("filmId") Long filmId,
                                   @PathVariable("userId") Long userId) {
         filmService.addLike(filmId, userId);
-        return filmService.getFilms().get(filmId);
+        return filmService.getMap().get(filmId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public Film deleteLikeByUser(@PathVariable("filmId") Long filmId,
                                  @PathVariable("userId") Long userId) {
         filmService.deleteLike(filmId, userId);
-        return filmService.getFilms().get(filmId);
+        return filmService.getMap().get(filmId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilm(@RequestParam(defaultValue = "10", required = false) String count) {
+    public List<Film> getMostPopularFilm(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
         try {
-            int filmCount = Integer.parseInt(count);
-            if (filmCount < 0) {
-                filmCount = 10;
+            if (count < 0) {
+                count = 10;
             }
-            return filmService.showMostLikedFilms(filmCount);
+            return filmService.showMostLikedFilms(count);
         } catch (NumberFormatException e) {
             e.getMessage();
         }

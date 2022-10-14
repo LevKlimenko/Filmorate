@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.Controller;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storages.film.InMemoryFilmStorage;
 
 import java.time.LocalDate;
@@ -15,7 +16,7 @@ public class FilmControllerTest {
     Film film;
 
     //FilmController fc = new FilmController();
-    InMemoryFilmStorage fs = new InMemoryFilmStorage();
+    FilmStorage filmStorage = new InMemoryFilmStorage();
 
 
     /**
@@ -30,8 +31,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.create(film);
-        assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
+        filmStorage.create(film);
+        assertEquals(1, filmStorage.getAll().size(), "Количество фильмов не совпадает");
     }
 
     @Test
@@ -42,15 +43,15 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.create(film);
+        filmStorage.create(film);
         Film film2 = Film.builder()
                 .name("testFilm2")
                 .description("testFilm2")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fs.create(film2);
-        assertEquals(2, fs.getAll().size(), "Количество фильмов не совпадает");
+        filmStorage.create(film2);
+        assertEquals(2, filmStorage.getAll().size(), "Количество фильмов не совпадает");
     }
 
     /**
@@ -66,7 +67,7 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 5, 5))
                 .duration(100)
                 .build();
-        fs.create(film);
+        filmStorage.create(film);
         Film film2 = Film.builder()
                 .id((long) 1)
                 .name("testFilm")
@@ -74,8 +75,8 @@ public class FilmControllerTest {
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .build();
-        fs.update(film2);
-        assertEquals(1, fs.getAll().size(), "Количество фильмов не совпадает");
+        filmStorage.update(film2);
+        assertEquals(1, filmStorage.getAll().size(), "Количество фильмов не совпадает");
     }
 
 }

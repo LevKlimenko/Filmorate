@@ -10,3 +10,8 @@ logging:
 server:
     error:
         include-message: always
+    servlet:
+        encoding:
+            charset: UTF-8
+            charset.force-response: true
+            charset.force-request: true
