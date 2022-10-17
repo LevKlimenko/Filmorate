@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class UserService implements UserFriend {
+public class UserService implements UserFriendService {
     private final UserStorage userStorage;
 
     @Autowired

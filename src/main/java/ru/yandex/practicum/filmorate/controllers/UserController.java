@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.services.user.UserFriend;
+import ru.yandex.practicum.filmorate.services.user.UserFriendService;
 import ru.yandex.practicum.filmorate.services.user.UserService;
 
 import javax.validation.Valid;
@@ -18,7 +18,7 @@ import java.util.Set;
 public class UserController {
 
     // private final UserService userService;
-    private final UserFriend userService;
+    private final UserFriendService userService;
     // private final UserByService userService;
 
     @Autowired

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class FilmService implements FilmLike {
+public class FilmService implements FilmLikeService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;

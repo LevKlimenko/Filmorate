@@ -1,11 +1,11 @@
 package ru.yandex.practicum.filmorate.services.user;
 
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.services.FilmorateService;
+import ru.yandex.practicum.filmorate.services.CrudService;
 
 import java.util.Set;
 
-public interface UserFriend extends FilmorateService<User> {
+public interface UserFriendService extends CrudService<User> {
 
     void becomeFriend(Long userId1, Long userId2);
 

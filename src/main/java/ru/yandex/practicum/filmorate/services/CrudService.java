@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @Service
-public interface FilmorateService<T> {
+public interface CrudService<T> {
     Collection<T> getAll();
 
     T create(T t);

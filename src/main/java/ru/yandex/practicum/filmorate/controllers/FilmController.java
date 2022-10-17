@@ -4,7 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.services.film.FilmLike;
+import ru.yandex.practicum.filmorate.services.film.FilmLikeService;
 import ru.yandex.practicum.filmorate.services.film.FilmService;
 
 import javax.validation.Valid;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("/films")
 public class FilmController {
 
-    private final FilmLike filmService;
+    private final FilmLikeService filmService;
 
     @Autowired
     public FilmController(FilmService filmService) {
