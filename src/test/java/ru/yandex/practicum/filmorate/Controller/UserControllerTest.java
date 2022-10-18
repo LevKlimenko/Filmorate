@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.storages.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -18,7 +19,7 @@ public class UserControllerTest {
 
     User user;
 
-    InMemoryUserStorage uc = new InMemoryUserStorage();
+    UserStorage userStorage = new InMemoryUserStorage();
 
     /**
      * Test POST
@@ -32,8 +33,8 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
-        assertEquals(1, uc.getUser().size(), "Количество пользователей не совпадает");
+        userStorage.create(user);
+        assertEquals(1, userStorage.getUser().size(), "Количество пользователей не совпадает");
     }
 
     @Test
@@ -44,16 +45,16 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .email("testUser2@yandex.ru")
                 .login("testLogin2")
                 .name("testName2")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user2);
-        assertEquals(2, uc.getUser().size(), "Количество пользователей не совпадает");
-        assertEquals(2, uc.getGeneratorId(), "Последнее ID не совпадает");
+        userStorage.create(user2);
+        assertEquals(2, userStorage.getUser().size(), "Количество пользователей не совпадает");
+        assertEquals(2, userStorage.getGeneratorId(), "Последнее ID не совпадает");
     }
 
     @Test
@@ -64,7 +65,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(BadRequestException.class, () -> uc.create(user), "Добавлен пользователь " + user.getLogin());
+        assertThrows(BadRequestException.class, () -> userStorage.create(user), "Добавлен пользователь " + user.getLogin());
     }
 
     @Test
@@ -74,7 +75,7 @@ public class UserControllerTest {
                 .login("testLogin")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         assertEquals(user.getLogin(), user.getName(), "Имя не совпадает с логином");
     }
 
@@ -86,7 +87,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.now())
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .id((long) 2)
                 .email("testUserUpdate@yandex.ru")
@@ -94,7 +95,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.now())
                 .build();
-        assertThrows(ConflictException.class, () -> uc.create(user2), "Пользователь добавлен");
+        assertThrows(ConflictException.class, () -> userStorage.create(user2), "Пользователь добавлен");
     }
 
     @Test
@@ -105,7 +106,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.now())
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .id((long) 2)
                 .email("testUser@yandex.ru")
@@ -113,7 +114,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.now())
                 .build();
-        assertThrows(ConflictException.class, () -> uc.create(user2), "Пользователь добавлен");
+        assertThrows(ConflictException.class, () -> userStorage.create(user2), "Пользователь добавлен");
     }
 
 
@@ -129,7 +130,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .id(user.getId())
                 .email("testUserUpdate@yandex.ru")
@@ -137,9 +138,9 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.update(user2);
-        assertEquals(1, uc.getUser().size(), "Количество пользователей не совпадает");
-        assertEquals(user2, uc.getMap().get((long)1), "Пользователи не совпадают");
+        userStorage.update(user2);
+        assertEquals(1, userStorage.getUser().size(), "Количество пользователей не совпадает");
+        assertEquals(user2, userStorage.getMap().get((long)1), "Пользователи не совпадают");
     }
 
     @Test
@@ -150,14 +151,14 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .email("testUserUpdate@yandex.ru")
                 .login("testLoginUpdate")
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(BadRequestException.class, () -> uc.update(user2), "Пользователь обновлен");
+        assertThrows(BadRequestException.class, () -> userStorage.update(user2), "Пользователь обновлен");
     }
 
     @Test
@@ -168,7 +169,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .id((long) -1)
                 .email("testUserUpdate@yandex.ru")
@@ -183,9 +184,9 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(NotFoundException.class, () -> uc.update(user2), "Пользователь c ID=" +
+        assertThrows(NotFoundException.class, () -> userStorage.update(user2), "Пользователь c ID=" +
                 user2.getId() + " обновлен");
-        assertThrows(NotFoundException.class, () -> uc.update(user3), "Пользователь c ID=" +
+        assertThrows(NotFoundException.class, () -> userStorage.update(user3), "Пользователь c ID=" +
                 user3.getId() + " обновлен");
     }
 
@@ -197,7 +198,7 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .id(user.getId())
                 .email("testUserUpdate@yandex.ru")
@@ -205,7 +206,7 @@ public class UserControllerTest {
                 .name("testNameUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        assertThrows(BadRequestException.class, () -> uc.update(user2), "Пользователь c ID=" +
+        assertThrows(BadRequestException.class, () -> userStorage.update(user2), "Пользователь c ID=" +
                 user2.getId() + " обновлен");
     }
 
@@ -217,14 +218,14 @@ public class UserControllerTest {
                 .name("testName")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.create(user);
+        userStorage.create(user);
         User user2 = User.builder()
                 .id(user.getId())
                 .email("testUserUpdate@yandex.ru")
                 .login("testLoginUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        uc.update(user2);
+        userStorage.update(user2);
         assertEquals(user2.getLogin(), user2.getName(), "Имя и Логин не совпадают");
     }
 }

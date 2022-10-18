@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class FilmService {
+public class FilmService implements FilmLikeService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
@@ -27,26 +27,31 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
+    @Override
     public Collection<Film> getAll() {
         return filmStorage.getAll();
     }
 
+    @Override
     public Film create(Film film) {
         return filmStorage.create(film);
     }
 
+    @Override
     public Film update(Film film) {
         return filmStorage.update(film);
     }
 
-    public Film findById(Long filmId) {
-        return filmStorage.findById(filmId);
+    @Override
+    public Film findById(Long id) {
+        return filmStorage.findById(id);
     }
 
+    @Override
     public void addLike(Long filmId, Long userId) {
         if (filmStorage.isExist(filmId)) {
             Film film = filmStorage.findById(filmId);
-            if (userStorage.isExist(userId)) {
+            if (userStorage.getMap().containsKey(userId)) {
                 filmStorage.getCompare().remove(filmStorage.findById(filmId));
                 film.getLikesId().add(userId);
                 log.debug("Пользователь с id {} добавил лайк к фильму с id {}.", userId, filmId);
@@ -57,10 +62,11 @@ public class FilmService {
         }
     }
 
+    @Override
     public void deleteLike(Long filmId, Long userId) {
         if (filmStorage.isExist(filmId)) {
             Film film = filmStorage.findById(filmId);
-            if (userStorage.isExist(userId)) {
+            if (userStorage.getMap().containsKey(userId)) {
                 filmStorage.getCompare().remove(filmStorage.findById(filmId));
                 film.getLikesId().remove(userId);
                 log.debug("Пользователь с id {} удалил лайк с фильма с id {}.", userId, filmId);
@@ -73,6 +79,7 @@ public class FilmService {
         }
     }
 
+    @Override
     public List<Film> showMostLikedFilms(Integer count) {
         List<Film> sortFilm = new ArrayList<>(filmStorage.getCompare());
         List<Film> likedFilms = new ArrayList<>();
@@ -87,7 +94,8 @@ public class FilmService {
         return likedFilms;
     }
 
-    public Map<Long, Film> getFilms() {
+    @Override
+    public Map<Long, Film> getMap() {
         return filmStorage.getMap();
     }
 }

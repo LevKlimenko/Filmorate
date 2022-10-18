@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.services.user.UserFriendService;
 import ru.yandex.practicum.filmorate.services.user.UserService;
 
 import javax.validation.Valid;
@@ -16,7 +17,9 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
+    // private final UserService userService;
+    private final UserFriendService userService;
+    // private final UserByService userService;
 
     @Autowired
     public UserController(UserService userService) {
@@ -47,14 +50,14 @@ public class UserController {
     public User addFriends(@PathVariable("user1") Long userId1,
                            @PathVariable("user2") Long userId2) {
         userService.becomeFriend(userId1, userId2);
-        return userService.getUsers().get(userId1);
+        return userService.getMap().get(userId1);
     }
 
     @DeleteMapping("/{user1}/friends/{user2}")
     public User deleteFriends(@PathVariable("user1") Long userId1,
                               @PathVariable("user2") Long userId2) {
         userService.stopBeingFriends(userId1, userId2);
-        return userService.getUsers().get(userId1);
+        return userService.getMap().get(userId1);
     }
 
     @GetMapping("/{id}/friends")

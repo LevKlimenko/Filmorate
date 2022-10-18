@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 @Service
-public class UserService {
+public class UserService implements UserFriendService {
     private final UserStorage userStorage;
 
     @Autowired
@@ -22,22 +22,27 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    @Override
     public Collection<User> getAll() {
         return userStorage.getUser();
     }
 
+    @Override
     public User create(User user) {
         return userStorage.create(user);
     }
 
+    @Override
     public User update(User user) {
         return userStorage.update(user);
     }
 
-    public User findById(Long userId) {
-        return userStorage.findById(userId);
+    @Override
+    public User findById(Long id) {
+        return userStorage.findById(id);
     }
 
+    @Override
     public void becomeFriend(Long userId1, Long userId2) {
         if (userStorage.isExist(userId1) && userStorage.isExist(userId2)) {
             User user1 = userStorage.getMap().get(userId1);
@@ -57,6 +62,7 @@ public class UserService {
         }
     }
 
+    @Override
     public void stopBeingFriends(Long userId1, Long userId2) {
         if (userStorage.isExist(userId1) && userStorage.isExist(userId2)) {
             User user1 = userStorage.getMap().get(userId1);
@@ -76,6 +82,7 @@ public class UserService {
         }
     }
 
+    @Override
     public Set<User> showAllUserFriends(Long userId) {
         Set<User> friends = new HashSet<>();
         for (Long id : userStorage.getMap().get(userId).getFriendsId()) {
@@ -84,6 +91,7 @@ public class UserService {
         return friends;
     }
 
+    @Override
     public Set<User> showIntersectionFriends(Long userId1, Long userId2) {
         User user1 = userStorage.getMap().get(userId1);
         User user2 = userStorage.getMap().get(userId2);
@@ -96,7 +104,9 @@ public class UserService {
         return interFriends;
     }
 
-    public Map<Long, User> getUsers() {
+    public Map<Long, User> getMap() {
         return userStorage.getMap();
     }
+
+
 }
