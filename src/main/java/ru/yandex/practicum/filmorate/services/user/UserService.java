@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UsersAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.models.constants.FriendStatus;
 import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.util.Collection;
@@ -48,9 +49,9 @@ public class UserService implements UserFriendService {
             User user1 = userStorage.getMap().get(userId1);
             User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
-                if (!user1.getFriendsId().contains(user2.getId())) {
-                    user1.getFriendsId().add(user2.getId());
-                    user2.getFriendsId().add(user1.getId());
+                if (!user1.getFriendsId().containsKey(user2.getId())) {
+                    user1.getFriendsId().put(user2.getId(), FriendStatus.SENT);
+                    user2.getFriendsId().put(user1.getId(),FriendStatus.RECEIVED);
                 } else {
                     throw new UsersAlreadyFriendsException("Уже находятся в друзьях друг у друга");
                 }
@@ -68,7 +69,7 @@ public class UserService implements UserFriendService {
             User user1 = userStorage.getMap().get(userId1);
             User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
-                if (user1.getFriendsId().contains(user2.getId())) {
+                if (user1.getFriendsId().containsKey(user2.getId())) {
                     user1.getFriendsId().remove(user2.getId());
                     user2.getFriendsId().remove(user1.getId());
                 } else {
@@ -85,7 +86,7 @@ public class UserService implements UserFriendService {
     @Override
     public Set<User> showAllUserFriends(Long userId) {
         Set<User> friends = new HashSet<>();
-        for (Long id : userStorage.getMap().get(userId).getFriendsId()) {
+        for (Long id : userStorage.getMap().get(userId).getFriendsId().keySet()) {
             friends.add(userStorage.getMap().get(id));
         }
         return friends;
@@ -95,9 +96,9 @@ public class UserService implements UserFriendService {
     public Set<User> showIntersectionFriends(Long userId1, Long userId2) {
         User user1 = userStorage.getMap().get(userId1);
         User user2 = userStorage.getMap().get(userId2);
-        Set<Long> interFriendsId = new HashSet<>(user1.getFriendsId());
+        Set<Long> interFriendsId = new HashSet<>(user1.getFriendsId().keySet());
         Set<User> interFriends = new HashSet<>();
-        interFriendsId.retainAll(user2.getFriendsId());
+        interFriendsId.retainAll(user2.getFriendsId().keySet());
         for (Long id : interFriendsId) {
             interFriends.add(userStorage.getMap().get(id));
         }

@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.models;
 
 import lombok.Builder;
 import lombok.Data;
+import ru.yandex.practicum.filmorate.models.constants.FilmGenre;
+import ru.yandex.practicum.filmorate.models.constants.FilmMPARating;
 import ru.yandex.practicum.filmorate.validators.DateReleaseConstraint;
 
 import javax.validation.constraints.NotBlank;
@@ -26,4 +28,8 @@ public class Film {
     @PositiveOrZero(message = "Продолжительность должна быть больше или равно 0")
     private int duration;
     private final Set<Long> likesId = new HashSet<>();
+    @NotNull
+    private final Set<FilmGenre> genre = new HashSet<>();
+    @NotNull
+    private final FilmMPARating MPARating;
 }
