@@ -30,17 +30,17 @@ INNER JOIN film_genre AS g ON g.film_id=f.id
 
 получение ТОП 10 фильмов:
 
-SELECT f.name,  
-        count(l.user_id) AS c   
-FROM film AS f  
-LEFT OUTER JOIN film-like AS l ON l.film_id=f.id  
-GROUP BY l.film_id  
-ORDER BY c DESC  
-TOTAL 10;  
+SELECT f.name,
+count(l.user_id) AS c
+FROM film AS f
+LEFT OUTER JOIN film_like AS l ON l.film_id=f.id
+GROUP BY l.film_id
+ORDER BY c DESC
+LIMIT 10;
 
 ---------------------------
 
-получение друзей пользователя:
+получение друзей пользователя:  
 SELECT u.name,  
        fr.name  
 FROM user AS u  
