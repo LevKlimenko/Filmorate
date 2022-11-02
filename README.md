@@ -21,17 +21,17 @@ WHERE id = 1;
 
 получение жанра:
 
-SELECT genre  
-FROM film AS f  
+SELECT fg.name
+FROM film_genre AS fg  
 WHERE f.id = N  
-INNER JOIN film_genre AS g ON g.film_id=f.id  
+INNER JOIN film AS f ON fg.film_id=f.id  
 
 ---------------------------
 
 получение ТОП 10 фильмов:
 
 SELECT f.name,
-count(l.user_id) AS c
+COUNT (l.user_id) AS c
 FROM film AS f
 LEFT OUTER JOIN film_like AS l ON l.film_id=f.id
 GROUP BY l.film_id
@@ -41,11 +41,10 @@ LIMIT 10;
 ---------------------------
 
 получение друзей пользователя:  
-SELECT u.name,  
-       fr.name  
+SELECT fr.name  
 FROM user AS u  
 RIGHT JOIN  user_friend AS fr ON fr.user1_id=u.id  
 LEFT JOIN user AS u2 ON fr.user2_id = u2.id  
 WHERE u.id = 1 and fr.status = 'APPROVED'  
 
-![This is an image](https://github.com/LevKlimenko/java-filmorate/blob/film-bd/final11SprintScheme.png)
+![This is an image](https://github.com/LevKlimenko/java-filmorate/blob/film-bd/Sprint11Scheme.png)
