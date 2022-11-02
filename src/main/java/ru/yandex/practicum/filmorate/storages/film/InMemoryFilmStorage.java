@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.constants.FilmGenre;
 
 import java.util.*;
 
@@ -46,6 +47,7 @@ public class InMemoryFilmStorage implements FilmStorage {
         log.info("Фильм {} сохранен с ID={}", film.getName(), film.getId());
         return film;
     }
+
 
     @Override
     public Film update(Film film) {
