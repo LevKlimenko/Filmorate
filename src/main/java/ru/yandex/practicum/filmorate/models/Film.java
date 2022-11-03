@@ -29,7 +29,7 @@ public class Film {
     private int duration;
     private final Set<Long> likesId = new HashSet<>();
     @NotNull
-    private final Set<FilmGenre> genre = new HashSet<>();
+    private final Set<Genre> genre = new HashSet<>();
     @NotNull
-    private final FilmMPARating MPARating;
+    private final Mpa mpa;
 }
