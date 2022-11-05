@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storages.user;
+/*package ru.yandex.practicum.filmorate.storages.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.models.User;
@@ -44,3 +44,4 @@ public class UserDbStorage implements UserStorage{
         return false;
     }
 }
+*/

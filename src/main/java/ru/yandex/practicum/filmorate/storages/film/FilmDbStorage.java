@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storages.film;
+/*package ru.yandex.practicum.filmorate.storages.film;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -9,7 +9,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.Genre;
-import ru.yandex.practicum.filmorate.models.constants.FilmGenre;
 
 import java.sql.*;
 import java.util.Collection;
@@ -21,6 +20,7 @@ import java.util.Set;
 @Component
 public class FilmDbStorage implements FilmStorage{
     private final JdbcTemplate jdbcTemplate;
+
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -35,10 +35,10 @@ public class FilmDbStorage implements FilmStorage{
     public Collection<Film> getAll() {
         return null;
     }
-    @Qualifier
+
     @Override
     public Film create(Film film) {
-        String sqlQuery = "insert into FILMS(NAME,RELEASE_DATE,DURATION,DESCRIPTION,MPA) values(?,?,?,?,?) ";
+        String sqlQuery = "insert into FILMS(name ,release_date,duration,description,mpa) values(?,?,?,?,?) ";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
@@ -64,7 +64,16 @@ public class FilmDbStorage implements FilmStorage{
 
     @Override
     public Film update(Film film) {
-        return null;
+        String sqlQuery = "UPDATE films set name = ?, release_date = ?, duration = ?, description =?, mpa = ? " +
+                "where id = ?";
+        jdbcTemplate.update(sqlQuery
+                ,film.getName()
+                ,film.getReleaseDate()
+                ,film.getDuration()
+                ,film.getDescription()
+                ,film.getMpa()
+                ,film.getId());
+        return findById(film.getId());
     }
 
     @Override
@@ -97,8 +106,9 @@ public class FilmDbStorage implements FilmStorage{
                 .description(resultSet.getString("description"))
                 .duration(resultSet.getInt("duration"))
                 //.mpa(mpaService.findMpaById(Long.valueOf((resultSet.getString("mpa")))))
-                //.genres(genreService.findFilmFenresByFilmId(resultSet.getLong("id")))
+                //.genres(genreService.findFilmGenresByFilmId(resultSet.getLong("id")))
                 .build();
 
     }
 }
+*/
