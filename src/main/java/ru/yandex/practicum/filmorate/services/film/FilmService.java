@@ -3,11 +3,14 @@ package ru.yandex.practicum.filmorate.services.film;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.storages.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storages.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.util.ArrayList;
@@ -19,10 +22,10 @@ import java.util.Map;
 public class FilmService implements FilmLikeService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
+    private final UserDbStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, UserDbStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
     }

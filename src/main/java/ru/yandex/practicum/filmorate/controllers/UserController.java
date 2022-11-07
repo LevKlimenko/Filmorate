@@ -5,7 +5,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.services.user.UserFriendService;
-import ru.yandex.practicum.filmorate.services.user.UserService;
+
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -17,14 +17,13 @@ import java.util.Set;
 @RequestMapping("/users")
 public class UserController {
 
-    // private final UserService userService;
     private final UserFriendService userService;
-    // private final UserByService userService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserFriendService userService) {
         this.userService = userService;
     }
+
 
     @GetMapping
     public Collection<User> getAllUser() {

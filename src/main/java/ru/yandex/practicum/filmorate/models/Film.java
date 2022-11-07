@@ -27,9 +27,11 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveOrZero(message = "Продолжительность должна быть больше или равно 0")
     private int duration;
-    private final Set<Long> likesId = new HashSet<>();
     @NotNull
+    private int rate;
+    @NotNull
+    private Mpa mpa;
     private final Set<Genre> genre = new HashSet<>();
-    @NotNull
-    private final Mpa mpa;
+    private final Set<Long> likesId = new HashSet<>();
+
 }

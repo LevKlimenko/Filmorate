@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.services.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -19,9 +20,10 @@ public class UserService implements UserFriendService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
+
 
     @Override
     public Collection<User> getAll() {
@@ -51,7 +53,7 @@ public class UserService implements UserFriendService {
             if (!userId1.equals(userId2)) {
                 if (!user1.getFriendsId().containsKey(user2.getId())) {
                     user1.getFriendsId().put(user2.getId(), FriendStatus.SENT);
-                    user2.getFriendsId().put(user1.getId(),FriendStatus.RECEIVED);
+                    user2.getFriendsId().put(user1.getId(), FriendStatus.RECEIVED);
                 } else {
                     throw new UsersAlreadyFriendsException("Уже находятся в друзьях друг у друга");
                 }

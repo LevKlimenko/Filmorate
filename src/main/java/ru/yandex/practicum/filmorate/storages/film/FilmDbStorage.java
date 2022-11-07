@@ -1,4 +1,4 @@
-/*package ru.yandex.practicum.filmorate.storages.film;
+package ru.yandex.practicum.filmorate.storages.film;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -33,12 +33,13 @@ public class FilmDbStorage implements FilmStorage{
 
     @Override
     public Collection<Film> getAll() {
-        return null;
+        String sqlQuery = "SELECT * from films";
+        return jdbcTemplate.query(sqlQuery,this::mapRowToFilm);
     }
 
     @Override
     public Film create(Film film) {
-        String sqlQuery = "insert into FILMS(name ,release_date,duration,description,mpa) values(?,?,?,?,?) ";
+        String sqlQuery = "insert into films(name,release_date,description,duration,rate,mpa) values(?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
@@ -46,7 +47,8 @@ public class FilmDbStorage implements FilmStorage{
             ps.setDate(2, Date.valueOf(film.getReleaseDate()));
             ps.setString(3,film.getDescription());
             ps.setInt(4, film.getDuration());
-            ps.setInt(5, Math.toIntExact(film.getMpa().getId()));
+            ps.setInt(5, film.getRate());
+            ps.setInt(6, Math.toIntExact(film.getMpa().getId()));
             return ps;
         }, keyHolder);
         long id = Objects.requireNonNull((keyHolder.getKey()).longValue());
@@ -105,10 +107,10 @@ public class FilmDbStorage implements FilmStorage{
                 .releaseDate((resultSet.getDate("release_date")).toLocalDate())
                 .description(resultSet.getString("description"))
                 .duration(resultSet.getInt("duration"))
+                .rate(resultSet.getInt("rate"))
                 //.mpa(mpaService.findMpaById(Long.valueOf((resultSet.getString("mpa")))))
                 //.genres(genreService.findFilmGenresByFilmId(resultSet.getLong("id")))
                 .build();
 
     }
 }
-*/
