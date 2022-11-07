@@ -31,13 +31,13 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        String sqlQuery = "insert into users(email, login, name, birthday) values (?,?,?,?)";
+        String sqlQuery = "insert into users( login, name,email, birthday) values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getLogin());
-            ps.setString(3, user.getName());
+            ps.setString(1, user.getLogin());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getEmail());
             ps.setDate(4, Date.valueOf(user.getBirthday()));
             return ps;
         }, keyHolder);
@@ -91,7 +91,7 @@ public class UserDbStorage implements UserStorage {
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("id"))
-                .email((resultSet.getString("name")))
+                .email((resultSet.getString("email")))
                 .login((resultSet.getString("login")))
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
