@@ -31,7 +31,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        String sqlQuery = "insert into users( login, name,email, birthday) values (?,?,?,?)";
+        String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
