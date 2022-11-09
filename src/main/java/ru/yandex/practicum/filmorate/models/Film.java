@@ -32,5 +32,5 @@ public class Film {
     @NotNull
     private Mpa mpa;
     private List<Genres> genres;
-    private  Set<Long> likesId;
+    private  List<Long> likesId;
 }

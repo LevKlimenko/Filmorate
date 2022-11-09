@@ -13,10 +13,8 @@ import ru.yandex.practicum.filmorate.services.genres.GenreService;
 import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
 import java.sql.*;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.sql.Date;
+import java.util.*;
 
 @Qualifier("filmDbStorage")
 @Component
@@ -131,6 +129,12 @@ public class FilmDbStorage implements FilmStorage {
                 .rate(resultSet.getInt("rate"))
                 .mpa(mpaService.findById(Long.valueOf((resultSet.getString("mpa")))))
                 .genres(genreService.findGenresOfFilm(Long.valueOf(resultSet.getString(("id")))))
+                .likesId(findUsersIdWhoLikedFilm(resultSet.getLong("id")))
                 .build();
+    }
+
+    private List<Long> findUsersIdWhoLikedFilm(Long id){
+        String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
+        return jdbcTemplate.queryForList(sqlQuery,Long.class,id);
     }
 }
