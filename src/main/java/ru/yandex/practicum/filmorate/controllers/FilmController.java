@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.services.film.FilmDbService;
 import ru.yandex.practicum.filmorate.services.film.FilmLikeService;
 import ru.yandex.practicum.filmorate.services.film.FilmService;
 
@@ -19,7 +20,7 @@ public class FilmController {
     private final FilmLikeService filmService;
 
     @Autowired
-    public FilmController(FilmService filmService) {
+    public FilmController(FilmDbService filmService) {
         this.filmService = filmService;
     }
 
@@ -47,14 +48,14 @@ public class FilmController {
     public Film addLikeFilmByUser(@PathVariable("filmId") Long filmId,
                                   @PathVariable("userId") Long userId) {
         filmService.addLike(filmId, userId);
-        return filmService.getMap().get(filmId);
+        return filmService.findById(filmId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public Film deleteLikeByUser(@PathVariable("filmId") Long filmId,
                                  @PathVariable("userId") Long userId) {
         filmService.deleteLike(filmId, userId);
-        return filmService.getMap().get(filmId);
+        return filmService.findById(filmId);
     }
 
     @GetMapping("/popular")

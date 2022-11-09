@@ -80,6 +80,7 @@ public class FilmDbStorage implements FilmStorage {
                     , film.getDuration()
                     , film.getRate()
                     , film.getMpa().getId()
+                    , film.getLikesId()
                     , film.getId());
             if (film.getGenres() != null) {
                 sqlQuery = "DELETE FROM film_genre where film_id = ?";
