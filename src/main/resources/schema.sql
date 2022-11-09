@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS films
     duration     INTEGER   NOT NULL,
     rate         INTEGER   NOT NULL,
     mpa          INTEGER   NOT NULL,
+    genres       INTEGER,
     CONSTRAINT duration_positive
     CHECK (duration >= 0),
     CONSTRAINT space_name
@@ -74,6 +75,5 @@ CREATE TABLE IF NOT EXISTS film_genre
     film_id  BIGINT  NOT NULL,
     genre_id INTEGER NOT NULL,
     CONSTRAINT "film_genre_film_id_foreign" FOREIGN KEY (film_id) REFERENCES FILMS (id),
-    CONSTRAINT "film_genre_genre_id_foreign" FOREIGN KEY (genre_id) REFERENCES GENRES (id),
-    PRIMARY KEY (film_id, genre_id)
+    CONSTRAINT "film_genre_genre_id_foreign" FOREIGN KEY (genre_id) REFERENCES GENRES (id)
     );
