@@ -42,8 +42,11 @@ public class FilmDbService implements FilmLikeService {
     }
 
     @Override
-    public List<Film> showMostLikedFilms(Integer count) {
-        return null;
+    public List showMostLikedFilms(Integer count) {
+        String sqlQuery = "SELECT film_id " +
+                "From likes GROUP BY film_id ORDER BY count(user_id) DESC LIMIT ? ";
+
+        return jdbcTemplate.queryForObject(sqlQuery,List.class, count);
     }
 
     @Override

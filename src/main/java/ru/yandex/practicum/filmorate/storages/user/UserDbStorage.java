@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
@@ -26,12 +27,13 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Collection<User> getUser() {
         String sqlQuery = "SELECT * from users";
-        return jdbcTemplate.query(sqlQuery,this::mapRowToUser);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
     public User create(User user) {
-        String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
+        checkBlankName(user);
+       String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
@@ -41,13 +43,14 @@ public class UserDbStorage implements UserStorage {
             ps.setDate(4, Date.valueOf(user.getBirthday()));
             return ps;
         }, keyHolder);
-        long id = Objects.requireNonNull(keyHolder.getKey().longValue());
+        long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
         return findById(id);
     }
 
 
     @Override
     public User update(User user) {
+        checkBlankName(user);
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday =?" +
                 "where id = ?";
         jdbcTemplate.update(sqlQuery
@@ -74,7 +77,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Map<Long, User> getMap() {
         String sqlQuery = "SELECT * from users";
-        return (Map<Long, User>) jdbcTemplate.query(sqlQuery,this::mapRowToUser);
+        return (Map<Long, User>) jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
@@ -96,5 +99,11 @@ public class UserDbStorage implements UserStorage {
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
                 .build();
+    }
+
+    private void checkBlankName(User user){
+        if (user.getName().isBlank()){
+            user.setName(user.getLogin());
+        }
     }
 }

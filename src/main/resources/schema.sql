@@ -56,18 +56,16 @@ CREATE TABLE IF NOT EXISTS friendship
     user_id   BIGINT NOT NULL,
     friend_id BIGINT NOT NULL,
     CONSTRAINT "friendship_friend_id_foreign" FOREIGN KEY (friend_id) REFERENCES users (id),
-    CONSTRAINT "friendship_user_id_foreign" FOREIGN KEY (user_id) REFERENCES users (id),
-    primary key (user_id, friend_id)
+    CONSTRAINT "friendship_user_id_foreign" FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 
 CREATE TABLE IF NOT EXISTS likes
 (
     film_id BIGINT NOT NULL,
-    user_id BIGINT NOT NULL UNIQUE ,
+    user_id BIGINT NOT NULL ,
     CONSTRAINT "likes_film_id_foreign" FOREIGN KEY (film_id) REFERENCES films (id),
-    CONSTRAINT "likes_user_id_foreign" FOREIGN KEY (user_id) REFERENCES users (id),
-    PRIMARY KEY (film_id, user_id)
+    CONSTRAINT "likes_user_id_foreign" FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 

@@ -8,10 +8,8 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.storages.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storages.user.UserDbStorage;
-import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.util.ArrayList;
 import java.util.Collection;

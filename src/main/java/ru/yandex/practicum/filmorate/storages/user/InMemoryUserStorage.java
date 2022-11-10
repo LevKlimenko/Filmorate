@@ -100,4 +100,5 @@ public class InMemoryUserStorage implements UserStorage {
     public boolean isExist(Long id) {
         return users.containsKey(id);
     }
+
 }
