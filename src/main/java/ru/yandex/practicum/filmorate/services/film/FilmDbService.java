@@ -8,7 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storages.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storages.user.UserDbStorage;
 
 import java.util.Collection;
@@ -19,11 +19,11 @@ import java.util.Map;
 public class FilmDbService implements FilmLikeService {
     private static final Logger log = LoggerFactory.getLogger(FilmController.class);
     private final JdbcTemplate jdbcTemplate;
-    private final FilmStorage filmStorage;
+    private final FilmDbStorage filmStorage;
     private final UserDbStorage userStorage;
 
     @Autowired
-    public FilmDbService(JdbcTemplate jdbcTemplate, @Qualifier("filmDbStorage") FilmStorage filmStorage, UserDbStorage userStorage) {
+    public FilmDbService(JdbcTemplate jdbcTemplate, @Qualifier("filmDbStorage") FilmDbStorage filmStorage, UserDbStorage userStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
@@ -37,17 +37,25 @@ public class FilmDbService implements FilmLikeService {
 
     @Override
     public void deleteLike(Long filmId, Long userId) {
-        String sqlQuery = "DELETE  from LIKES WHERE (FILM_ID=? and USER_ID=?)";
-        jdbcTemplate.update(sqlQuery,filmId,userId);
+        String sqlQuery = "DELETE from LIKES WHERE USER_ID IN (SELECT ID FROM USERS where ID=?)  AND FILM_ID " +
+                "IN (SELECT ID FROM FILMS where ID=?)";
+        jdbcTemplate.update(sqlQuery,userId,filmId);
     }
+
+
+
 
     @Override
-    public List showMostLikedFilms(Integer count) {
-        String sqlQuery = "SELECT film_id " +
-                "From likes GROUP BY film_id ORDER BY count(user_id) DESC LIMIT ? ";
+    public List<Film> showMostLikedFilms(Integer count) {
+        String sqlQuery = "SELECT f.ID, count(DISTINCT LIKES.USER_ID) as cnt " +
+                "From FILMS f LEFT JOIN LIKES on F.ID = LIKES.FILM_ID " +
+                "GROUP BY f.ID " +
+                                    "ORDER BY cnt DESC LIMIT ? ";
+        List<Long> filmsRows = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("id"), count);
 
-        return jdbcTemplate.queryForObject(sqlQuery,List.class, count);
+        return filmStorage.getFilms(filmsRows);
     }
+
 
     @Override
     public Collection<Film> getAll() {
@@ -73,4 +81,5 @@ public class FilmDbService implements FilmLikeService {
     public Map<Long, Film> getMap() {
         return filmStorage.getMap();
     }
+
 }

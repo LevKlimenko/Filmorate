@@ -74,6 +74,16 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
+
+    public void findInLikeUserById(Long id) {
+        String sqlQuery = "SELECT * IF EXIST (SELECT * FROM likes where USER_ID = ?)";
+        try {
+            jdbcTemplate.update(sqlQuery, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Фильм с id=%d не найден.", id));
+        }
+    }
+
     @Override
     public Map<Long, User> getMap() {
         String sqlQuery = "SELECT * from users";

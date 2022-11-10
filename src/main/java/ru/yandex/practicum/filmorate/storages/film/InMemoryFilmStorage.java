@@ -82,4 +82,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     public boolean isExist(Long id) {
         return films.containsKey(id);
     }
+
+    @Override
+    public List<Film> getFilms(List<Long> filmsId) {
+        List<Film> allFilms = new ArrayList<>();
+        for (Long id:filmsId) {
+            allFilms.add(films.get(id));
+        }
+        return allFilms;
+    }
 }

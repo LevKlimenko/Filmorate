@@ -43,7 +43,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        String sqlQuery = "insert into films(name,release_date,description,duration,rate,mpa) values(?,?,?,?,?,?)";
+        String sqlQuery = "insert into films(name,releaseDate,description,duration,rate,mpa) values(?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
@@ -65,12 +65,13 @@ public class FilmDbStorage implements FilmStorage {
                         genres.getId());
             }
         }
+
         return findById(id);
     }
 
     @Override
     public Film update(Film film) {
-        String sqlQuery = "UPDATE films set name = ?, release_date = ?, description =?, duration = ?,rate=?, mpa = ? " +
+        String sqlQuery = "UPDATE films set name = ?, releaseDate = ?, description =?, duration = ?,rate=?, mpa = ? " +
                 "where id = ?";
         try {
             jdbcTemplate.update(sqlQuery
@@ -80,7 +81,6 @@ public class FilmDbStorage implements FilmStorage {
                     , film.getDuration()
                     , film.getRate()
                     , film.getMpa().getId()
-                    , film.getLikesId()
                     , film.getId());
             if (film.getGenres() != null) {
                 sqlQuery = "DELETE FROM film_genre where film_id = ?";
@@ -120,11 +120,11 @@ public class FilmDbStorage implements FilmStorage {
         return false;
     }
 
-    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+    public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getLong("id"))
                 .name((resultSet.getString("name")))
-                .releaseDate((resultSet.getDate("release_date")).toLocalDate())
+                .releaseDate((resultSet.getDate("releaseDate")).toLocalDate())
                 .description(resultSet.getString("description"))
                 .duration(resultSet.getInt("duration"))
                 .rate(resultSet.getInt("rate"))
@@ -134,8 +134,26 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+    @Override
+    public List<Film> getFilms(List<Long> filmsId){
+        String inSql = String.join(",", Collections.nCopies(filmsId.size(),"?"));
+        return jdbcTemplate.query(String.format("SELECT * FROM films WHERE id in (%s)", inSql),
+                this::mapRowToFilm,
+        filmsId.toArray());
+    }
+
+
     private List<Long> findUsersIdWhoLikedFilm(Long id){
         String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
         return jdbcTemplate.queryForList(sqlQuery,Long.class,id);
+    }
+
+    public void findInLikeFilmById(Long filmId) {
+        String sqlQuery = "SELECT * IF EXIST (SELECT * FROM likes where FILM_ID = ?)";
+       try {
+            jdbcTemplate.queryForObject(sqlQuery,this::mapRowToFilm, filmId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Фильм с id=%d не найден.", filmId));
+        }
     }
 }
