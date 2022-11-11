@@ -3,10 +3,10 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.services.film.FilmDbService;
 import ru.yandex.practicum.filmorate.services.film.FilmLikeService;
-import ru.yandex.practicum.filmorate.services.film.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -52,10 +52,13 @@ public class FilmController {
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
-    public Film deleteLikeByUser(@PathVariable("filmId") Long filmId,
-                                 @PathVariable("userId") Long userId) {
-        filmService.deleteLike(filmId, userId);
-        return filmService.findById(filmId);
+    public Boolean deleteLikeByUser(@PathVariable("filmId") Long filmId,
+                                    @PathVariable("userId") Long userId) {
+        if (!filmService.deleteLike(filmId, userId)) {
+            throw new NotFoundException("Строка с filmId=" + filmId + " и userId=" + userId + " не найдена");
+        }
+        ;
+        return true;
     }
 
     @GetMapping("/popular")

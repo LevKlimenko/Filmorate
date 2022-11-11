@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.controllers.FilmController;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.constants.FilmGenre;
 
 import java.util.*;
 
@@ -86,7 +85,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getFilms(List<Long> filmsId) {
         List<Film> allFilms = new ArrayList<>();
-        for (Long id:filmsId) {
+        for (Long id : filmsId) {
             allFilms.add(films.get(id));
         }
         return allFilms;

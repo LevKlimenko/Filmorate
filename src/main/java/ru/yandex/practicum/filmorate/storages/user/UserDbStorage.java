@@ -6,14 +6,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
+import java.sql.Date;
 import java.sql.*;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Qualifier("userDbStorage")
 @Component
@@ -33,7 +31,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User create(User user) {
         checkBlankName(user);
-       String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
+        String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
@@ -74,16 +72,6 @@ public class UserDbStorage implements UserStorage {
         return user;
     }
 
-
-    public void findInLikeUserById(Long id) {
-        String sqlQuery = "SELECT * IF EXIST (SELECT * FROM likes where USER_ID = ?)";
-        try {
-            jdbcTemplate.update(sqlQuery, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Фильм с id=%d не найден.", id));
-        }
-    }
-
     @Override
     public Map<Long, User> getMap() {
         String sqlQuery = "SELECT * from users";
@@ -108,11 +96,24 @@ public class UserDbStorage implements UserStorage {
                 .login((resultSet.getString("login")))
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
+                .friendsId(findUsersFriends(resultSet.getLong("id")))
                 .build();
     }
 
-    private void checkBlankName(User user){
-        if (user.getName().isBlank()){
+    private List<Long> findUsersFriends(Long id) {
+        String sqlQuery = "SELECT FRIEND_ID FROM friendship WHERE USER_ID = ?";
+        return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
+    }
+
+    public List<User> getUsers(List<Long> userId) {
+        String inSql = String.join(",", Collections.nCopies(userId.size(), "?"));
+        return jdbcTemplate.query(String.format("SELECT * FROM users WHERE id in (%s)", inSql),
+                this::mapRowToUser,
+                userId.toArray());
+    }
+
+    private void checkBlankName(User user) {
+        if (user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }

@@ -32,25 +32,21 @@ public class FilmDbService implements FilmLikeService {
     @Override
     public void addLike(Long filmId, Long userId) {
         String sqlQuery = "MERGE INTO LIKES key(FILM_ID,USER_ID) values (?, ?)";
-        jdbcTemplate.update(sqlQuery,filmId,userId);
+        jdbcTemplate.update(sqlQuery, filmId, userId);
     }
 
     @Override
-    public void deleteLike(Long filmId, Long userId) {
-        String sqlQuery = "DELETE from LIKES WHERE USER_ID IN (SELECT ID FROM USERS where ID=?)  AND FILM_ID " +
-                "IN (SELECT ID FROM FILMS where ID=?)";
-        jdbcTemplate.update(sqlQuery,userId,filmId);
+    public boolean deleteLike(Long filmId, Long userId) {
+        String sqlQuery = "DELETE from LIKES WHERE FILM_ID=? AND USER_ID=?";
+        return jdbcTemplate.update(sqlQuery, filmId, userId) > 0;
     }
-
-
-
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
         String sqlQuery = "SELECT f.ID, count(DISTINCT LIKES.USER_ID) as cnt " +
                 "From FILMS f LEFT JOIN LIKES on F.ID = LIKES.FILM_ID " +
                 "GROUP BY f.ID " +
-                                    "ORDER BY cnt DESC LIMIT ? ";
+                "ORDER BY cnt DESC LIMIT ? ";
         List<Long> filmsRows = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("id"), count);
 
         return filmStorage.getFilms(filmsRows);

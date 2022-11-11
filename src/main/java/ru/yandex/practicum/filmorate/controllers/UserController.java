@@ -3,13 +3,14 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
+import ru.yandex.practicum.filmorate.services.user.UserDbService;
 import ru.yandex.practicum.filmorate.services.user.UserFriendService;
-
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.Set;
+import java.util.List;
 
 
 @Validated
@@ -20,7 +21,7 @@ public class UserController {
     private final UserFriendService userService;
 
     @Autowired
-    public UserController(UserFriendService userService) {
+    public UserController(UserDbService userService) {
         this.userService = userService;
     }
 
@@ -48,25 +49,29 @@ public class UserController {
     @PutMapping("/{user1}/friends/{user2}")
     public User addFriends(@PathVariable("user1") Long userId1,
                            @PathVariable("user2") Long userId2) {
-        userService.becomeFriend(userId1, userId2);
-        return userService.getMap().get(userId1);
+        if (!userService.becomeFriend(userId1, userId2)) {
+            throw new NotFoundException("Пользователи не могут стать друзьями");
+        }
+        return userService.findById(userId1);
     }
 
     @DeleteMapping("/{user1}/friends/{user2}")
     public User deleteFriends(@PathVariable("user1") Long userId1,
                               @PathVariable("user2") Long userId2) {
-        userService.stopBeingFriends(userId1, userId2);
-        return userService.getMap().get(userId1);
+        if (!userService.stopBeingFriends(userId1, userId2)) {
+            throw new NotFoundException("Дружба между пользователями не найдена");
+        }
+        return userService.findById(userId1);
     }
 
     @GetMapping("/{id}/friends")
-    public Set<User> showUserFriends(@PathVariable("id") Long userId) {
+    public List<User> showUserFriends(@PathVariable("id") Long userId) {
         return userService.showAllUserFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public Set<User> showIntersectionFriends(@PathVariable("id") Long userId1,
-                                             @PathVariable("otherId") Long userId2) {
+    public List<User> showIntersectionFriends(@PathVariable("id") Long userId1,
+                                              @PathVariable("otherId") Long userId2) {
         return userService.showIntersectionFriends(userId1, userId2);
     }
 }

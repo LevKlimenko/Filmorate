@@ -7,13 +7,12 @@ import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.UsersAlreadyFriendsException;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.models.constants.FriendStatus;
 import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @Service
 public class UserService implements UserFriendService {
@@ -46,14 +45,14 @@ public class UserService implements UserFriendService {
     }
 
     @Override
-    public void becomeFriend(Long userId1, Long userId2) {
+    public boolean becomeFriend(Long userId1, Long userId2) {
         if (userStorage.isExist(userId1) && userStorage.isExist(userId2)) {
             User user1 = userStorage.getMap().get(userId1);
             User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
-                if (!user1.getFriendsId().containsKey(user2.getId())) {
-                    user1.getFriendsId().put(user2.getId(), FriendStatus.SENT);
-                    user2.getFriendsId().put(user1.getId(), FriendStatus.RECEIVED);
+                if (!user1.getFriendsId().contains(user2.getId())) {
+                    user1.getFriendsId().add(user2.getId());
+                    user2.getFriendsId().add(user1.getId());
                 } else {
                     throw new UsersAlreadyFriendsException("Уже находятся в друзьях друг у друга");
                 }
@@ -63,15 +62,16 @@ public class UserService implements UserFriendService {
         } else {
             throw new NotFoundException("Нельзя задать несуществующего пользователя");
         }
+        return true;
     }
 
     @Override
-    public void stopBeingFriends(Long userId1, Long userId2) {
+    public boolean stopBeingFriends(Long userId1, Long userId2) {
         if (userStorage.isExist(userId1) && userStorage.isExist(userId2)) {
             User user1 = userStorage.getMap().get(userId1);
             User user2 = userStorage.getMap().get(userId2);
             if (!userId1.equals(userId2)) {
-                if (user1.getFriendsId().containsKey(user2.getId())) {
+                if (user1.getFriendsId().contains(user2.getId())) {
                     user1.getFriendsId().remove(user2.getId());
                     user2.getFriendsId().remove(user1.getId());
                 } else {
@@ -83,24 +83,25 @@ public class UserService implements UserFriendService {
         } else {
             throw new NotFoundException("Нельзя задать несуществующего пользователя");
         }
+        return true;
     }
 
     @Override
-    public Set<User> showAllUserFriends(Long userId) {
-        Set<User> friends = new HashSet<>();
-        for (Long id : userStorage.getMap().get(userId).getFriendsId().keySet()) {
+    public List<User> showAllUserFriends(Long userId) {
+        List<User> friends = new ArrayList<>();
+        for (Long id : userStorage.getMap().get(userId).getFriendsId()) {
             friends.add(userStorage.getMap().get(id));
         }
         return friends;
     }
 
     @Override
-    public Set<User> showIntersectionFriends(Long userId1, Long userId2) {
+    public List<User> showIntersectionFriends(Long userId1, Long userId2) {
         User user1 = userStorage.getMap().get(userId1);
         User user2 = userStorage.getMap().get(userId2);
-        Set<Long> interFriendsId = new HashSet<>(user1.getFriendsId().keySet());
-        Set<User> interFriends = new HashSet<>();
-        interFriendsId.retainAll(user2.getFriendsId().keySet());
+        List<Long> interFriendsId = new ArrayList<>(user1.getFriendsId());
+        List<User> interFriends = new ArrayList<>();
+        interFriendsId.retainAll(user2.getFriendsId());
         for (Long id : interFriendsId) {
             interFriends.add(userStorage.getMap().get(id));
         }

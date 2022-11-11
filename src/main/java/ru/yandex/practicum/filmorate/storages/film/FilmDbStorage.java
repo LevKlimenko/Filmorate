@@ -12,8 +12,8 @@ import ru.yandex.practicum.filmorate.models.Genres;
 import ru.yandex.practicum.filmorate.services.genres.GenreService;
 import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.util.*;
 
 @Qualifier("filmDbStorage")
@@ -135,25 +135,17 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getFilms(List<Long> filmsId){
-        String inSql = String.join(",", Collections.nCopies(filmsId.size(),"?"));
+    public List<Film> getFilms(List<Long> filmsId) {
+        String inSql = String.join(",", Collections.nCopies(filmsId.size(), "?"));
         return jdbcTemplate.query(String.format("SELECT * FROM films WHERE id in (%s)", inSql),
                 this::mapRowToFilm,
-        filmsId.toArray());
+                filmsId.toArray());
     }
 
 
-    private List<Long> findUsersIdWhoLikedFilm(Long id){
+    private List<Long> findUsersIdWhoLikedFilm(Long id) {
         String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
-        return jdbcTemplate.queryForList(sqlQuery,Long.class,id);
+        return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
     }
 
-    public void findInLikeFilmById(Long filmId) {
-        String sqlQuery = "SELECT * IF EXIST (SELECT * FROM likes where FILM_ID = ?)";
-       try {
-            jdbcTemplate.queryForObject(sqlQuery,this::mapRowToFilm, filmId);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Фильм с id=%d не найден.", filmId));
-        }
-    }
 }

@@ -9,7 +9,6 @@ import ru.yandex.practicum.filmorate.storages.film.InMemoryFilmStorage;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootApplication
 public class FilmControllerTest {

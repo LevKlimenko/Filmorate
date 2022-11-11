@@ -16,15 +16,15 @@ public class GenreService {
         this.genreDbStorage = genreDbStorage;
     }
 
-    public Genres findById(Long id){
+    public Genres findById(Long id) {
         return genreDbStorage.findGenreById(id);
     }
 
-    public List<Genres> getAll(){
+    public List<Genres> getAll() {
         return genreDbStorage.findAllGenre();
     }
 
-    public List<Genres> findGenresOfFilm(Long id){
+    public List<Genres> findGenresOfFilm(Long id) {
         return genreDbStorage.findGenresOfFilm(id);
     }
 }

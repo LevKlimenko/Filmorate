@@ -64,7 +64,7 @@ public class FilmService implements FilmLikeService {
     }
 
     @Override
-    public void deleteLike(Long filmId, Long userId) {
+    public boolean deleteLike(Long filmId, Long userId) {
         if (filmStorage.isExist(filmId)) {
             Film film = filmStorage.findById(filmId);
             if (userStorage.getMap().containsKey(userId)) {
@@ -78,6 +78,7 @@ public class FilmService implements FilmLikeService {
         } else {
             throw new NotFoundException(String.format("Фильма с id=%d не существует", filmId));
         }
+        return true;
     }
 
     @Override

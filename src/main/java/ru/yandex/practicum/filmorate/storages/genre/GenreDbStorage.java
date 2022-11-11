@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.models.Genres;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,30 +18,29 @@ public class GenreDbStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Genres findGenreById(Long id){
-       String sqlQuery = " select * from genres where id = ?";
+    public Genres findGenreById(Long id) {
+        String sqlQuery = " select * from genres where id = ?";
         Genres genres;
-        try{
-            genres = jdbcTemplate.queryForObject(sqlQuery,this::mapRowToGenre, id);
+        try {
+            genres = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Genre с id " + id +  " не найден");
+            throw new NotFoundException("Genre с id " + id + " не найден");
         }
         return genres;
     }
 
-    public List<Genres> findAllGenre(){
+    public List<Genres> findAllGenre() {
         String sqlQuery = "SELECT * from genres";
-        return jdbcTemplate.query(sqlQuery,this::mapRowToGenre);
+        return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
 
-    public List<Genres> findGenresOfFilm(Long id){
+    public List<Genres> findGenresOfFilm(Long id) {
         List<Genres> genres;
-        try{
-       String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
-             genres= jdbcTemplate.query(sqlQuery,this::mapRowToGenre, id);
-       }
-        catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Баг с id " + id +  " не найден");
+        try {
+            String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
+            genres = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("Жанр с id " + id + " не найден");
         }
         return genres;
     }

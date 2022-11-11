@@ -140,7 +140,7 @@ public class UserControllerTest {
                 .build();
         userStorage.update(user2);
         assertEquals(1, userStorage.getUser().size(), "Количество пользователей не совпадает");
-        assertEquals(user2, userStorage.getMap().get((long)1), "Пользователи не совпадают");
+        assertEquals(user2, userStorage.getMap().get((long) 1), "Пользователи не совпадают");
     }
 
     @Test
