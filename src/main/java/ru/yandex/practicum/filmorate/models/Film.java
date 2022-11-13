@@ -15,6 +15,7 @@ import java.util.List;
 @Builder
 public class Film {
     private Long id;
+    @NotNull
     @NotBlank(message = "Название не может быть пустым или состоять только из пробелов")
     private String name;
     @Size(max = 200, message = "Длина описания больше 200 символов")

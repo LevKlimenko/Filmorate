@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface UserFriendService extends CrudService<User> {
 
-    boolean becomeFriend(Long userId1, Long userId2);
+    void becomeFriend(Long userId1, Long userId2);
 
-    boolean stopBeingFriends(Long userId1, Long userId2);
+    void stopBeingFriends(Long userId1, Long userId2);
 
     List<User> showAllUserFriends(Long userId);
 

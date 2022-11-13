@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.services;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.Map;
 
 @Service
 public interface CrudService<T> {
@@ -14,6 +13,4 @@ public interface CrudService<T> {
     T update(T t);
 
     T findById(Long id);
-
-    Map<Long, T> getMap();
 }

@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.services.user.UserDbService;
 import ru.yandex.practicum.filmorate.services.user.UserFriendService;
@@ -49,18 +48,14 @@ public class UserController {
     @PutMapping("/{user1}/friends/{user2}")
     public User addFriends(@PathVariable("user1") Long userId1,
                            @PathVariable("user2") Long userId2) {
-        if (!userService.becomeFriend(userId1, userId2)) {
-            throw new NotFoundException("Пользователи не могут стать друзьями");
-        }
+        userService.becomeFriend(userId1, userId2);
         return userService.findById(userId1);
     }
 
     @DeleteMapping("/{user1}/friends/{user2}")
     public User deleteFriends(@PathVariable("user1") Long userId1,
                               @PathVariable("user2") Long userId2) {
-        if (!userService.stopBeingFriends(userId1, userId2)) {
-            throw new NotFoundException("Дружба между пользователями не найдена");
-        }
+        userService.stopBeingFriends(userId1, userId2);
         return userService.findById(userId1);
     }
 

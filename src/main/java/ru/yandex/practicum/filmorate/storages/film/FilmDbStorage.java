@@ -12,9 +12,11 @@ import ru.yandex.practicum.filmorate.models.Genres;
 import ru.yandex.practicum.filmorate.services.genres.GenreService;
 import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
-import java.sql.Date;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 @Qualifier("filmDbStorage")
 @Component
@@ -28,11 +30,6 @@ public class FilmDbStorage implements FilmStorage {
         this.jdbcTemplate = jdbcTemplate;
         this.mpaService = mpaService;
         this.genreService = genreService;
-    }
-
-    @Override
-    public Set<Film> getCompare() {
-        return null;
     }
 
     @Override
@@ -56,7 +53,7 @@ public class FilmDbStorage implements FilmStorage {
             return ps;
         }, keyHolder);
         long id = Objects.requireNonNull((keyHolder.getKey()).longValue());
-
+        film.setId(id);
         if (film.getGenres() != null) {
             for (Genres genres : film.getGenres()) {
                 String sql = "insert into FILM_GENRE values (?, ?)";
@@ -65,7 +62,6 @@ public class FilmDbStorage implements FilmStorage {
                         genres.getId());
             }
         }
-
         return findById(id);
     }
 
@@ -97,7 +93,6 @@ public class FilmDbStorage implements FilmStorage {
         }
     }
 
-
     @Override
     public Film findById(Long filmId) {
         String sqlQuery = "SELECT * FROM films where id = ?";
@@ -111,13 +106,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public Map<Long, Film> getMap() {
-        return null;
-    }
-
-    @Override
     public boolean isExist(Long id) {
-        return false;
+        if (findById(id) == null) {
+            throw new NotFoundException("Film with id=" + id + " not found");
+        }
+        return true;
     }
 
     public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
@@ -134,18 +127,18 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+
     @Override
     public List<Film> getFilms(List<Long> filmsId) {
-        String inSql = String.join(",", Collections.nCopies(filmsId.size(), "?"));
-        return jdbcTemplate.query(String.format("SELECT * FROM films WHERE id in (%s)", inSql),
-                this::mapRowToFilm,
-                filmsId.toArray());
+        List<Film> films = new ArrayList<>();
+        for (Long id : filmsId) {
+            films.add(findById(id));
+        }
+        return films;
     }
-
 
     private List<Long> findUsersIdWhoLikedFilm(Long id) {
         String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
         return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
     }
-
 }

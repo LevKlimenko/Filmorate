@@ -6,12 +6,15 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
-import java.sql.Date;
 import java.sql.*;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 @Qualifier("userDbStorage")
 @Component
@@ -23,14 +26,14 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Collection<User> getUser() {
+    public Collection<User> getAll() {
         String sqlQuery = "SELECT * from users";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
 
     @Override
     public User create(User user) {
-        checkBlankName(user);
+        checkBlankAndNullName(user);
         String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -42,13 +45,17 @@ public class UserDbStorage implements UserStorage {
             return ps;
         }, keyHolder);
         long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
+        user.setId(id);
         return findById(id);
     }
 
-
     @Override
     public User update(User user) {
-        checkBlankName(user);
+        if (user.getId() == null) {
+            throw new BadRequestException("Can't update user without ID");
+        }
+        isExist(user.getId());
+        checkBlankAndNullName(user);
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday =?" +
                 "where id = ?";
         jdbcTemplate.update(sqlQuery
@@ -73,21 +80,12 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public Map<Long, User> getMap() {
-        String sqlQuery = "SELECT * from users";
-        return (Map<Long, User>) jdbcTemplate.query(sqlQuery, this::mapRowToUser);
-    }
-
-    @Override
-    public long getGeneratorId() {
-        return 0;
-    }
-
-    @Override
     public boolean isExist(Long id) {
-        return false;
+        if (findById(id) == null) {
+            throw new NotFoundException("User with id=" + id + " not found");
+        }
+        return true;
     }
-
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
@@ -112,8 +110,8 @@ public class UserDbStorage implements UserStorage {
                 userId.toArray());
     }
 
-    private void checkBlankName(User user) {
-        if (user.getName().isBlank()) {
+    private void checkBlankAndNullName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }

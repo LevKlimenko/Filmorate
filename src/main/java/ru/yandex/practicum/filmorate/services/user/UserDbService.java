@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.storages.user.UserDbStorage;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserDbService implements UserFriendService {
@@ -21,25 +20,33 @@ public class UserDbService implements UserFriendService {
     }
 
     @Override
-    public boolean becomeFriend(Long userId1, Long userId2) {
+    public void becomeFriend(Long userId1, Long userId2) {
         if (userId1.equals(userId2)) {
-            throw new ConflictException("Нельзя добавить себя в друзья");
+            throw new ConflictException("Сan't add yourself as a friend");
         }
-        if (findById(userId1) != null && findById(userId2) != null) {
+        if (userDbStorage.isExist(userId1) && userDbStorage.isExist(userId2)) {
             String sqlQuery = "MERGE INTO FRIENDSHIP key(USER_ID, FRIEND_ID) values(?,?)";
-            return jdbcTemplate.update(sqlQuery, userId1, userId2) > 0;
+            int row = jdbcTemplate.update(sqlQuery, userId1, userId2);
+            if (row == 0) {
+                throw new ConflictException("User id:" + userId1 + " and user id:" + userId2 + " already friends");
+            }
         }
-        return false;
     }
 
     @Override
-    public boolean stopBeingFriends(Long userId1, Long userId2) {
-        String sqlQuery = "DELETE FROM FRIENDSHIP WHERE USER_ID=? and FRIEND_ID=?";
-        return jdbcTemplate.update(sqlQuery, userId1, userId2) > 0;
+    public void stopBeingFriends(Long userId1, Long userId2) {
+        if (userDbStorage.isExist(userId1) && userDbStorage.isExist(userId2)) {
+            String sqlQuery = "DELETE FROM FRIENDSHIP WHERE USER_ID=? and FRIEND_ID=?";
+            int row = jdbcTemplate.update(sqlQuery, userId1, userId2);
+            if (row == 0) {
+                throw new ConflictException("Users ain't friends ");
+            }
+        }
     }
 
     @Override
     public List<User> showAllUserFriends(Long userId) {
+        userDbStorage.isExist(userId);
         String sqlQuery = "SELECT ID From Users u WHERE ID in (SELECT FRIEND_ID FROM FRIENDSHIP where USER_ID = ? )";
         List<Long> filmRows = jdbcTemplate.queryForList(sqlQuery, Long.class, userId);
         return userDbStorage.getUsers(filmRows);
@@ -47,6 +54,8 @@ public class UserDbService implements UserFriendService {
 
     @Override
     public List<User> showIntersectionFriends(Long userId1, Long userId2) {
+        userDbStorage.isExist(userId1);
+        userDbStorage.isExist(userId2);
         String sqlQuery = "SELECT FRIEND_ID FROM FRIENDSHIP WHERE USER_ID=? INTERSECT ( SELECT FRIEND_ID FROM " +
                 "FRIENDSHIP WHERE USER_ID=?)";
         List<Long> filmRows = jdbcTemplate.queryForList(sqlQuery, Long.class, userId1, userId2);
@@ -55,7 +64,7 @@ public class UserDbService implements UserFriendService {
 
     @Override
     public Collection<User> getAll() {
-        return userDbStorage.getUser();
+        return userDbStorage.getAll();
     }
 
     @Override
@@ -71,10 +80,5 @@ public class UserDbService implements UserFriendService {
     @Override
     public User findById(Long id) {
         return userDbStorage.findById(id);
-    }
-
-    @Override
-    public Map<Long, User> getMap() {
-        return userDbStorage.getMap();
     }
 }
