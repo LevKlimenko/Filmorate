@@ -8,8 +8,8 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.Genres;
-import ru.yandex.practicum.filmorate.services.genres.GenreService;
+import ru.yandex.practicum.filmorate.models.Genre;
+import ru.yandex.practicum.filmorate.services.genre.GenreService;
 import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
 import java.sql.*;
@@ -45,7 +45,7 @@ public class FilmDbStorage implements FilmStorage {
         jdbcTemplate.update(connection -> {
             PreparedStatement ps = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, film.getName());
-            ps.setDate(2, Date.valueOf(film.getReleaseDate()));
+            ps.setObject(2, film.getReleaseDate());
             ps.setString(3, film.getDescription());
             ps.setInt(4, film.getDuration());
             ps.setInt(5, film.getRate());
@@ -55,11 +55,11 @@ public class FilmDbStorage implements FilmStorage {
         long id = Objects.requireNonNull((keyHolder.getKey()).longValue());
         film.setId(id);
         if (film.getGenres() != null) {
-            for (Genres genres : film.getGenres()) {
+            for (Genre genre : film.getGenres()) {
                 String sql = "insert into FILM_GENRE values (?, ?)";
                 jdbcTemplate.update(sql,
                         id,
-                        genres.getId());
+                        genre.getId());
             }
         }
         return findById(id);
@@ -81,15 +81,15 @@ public class FilmDbStorage implements FilmStorage {
             if (film.getGenres() != null) {
                 sqlQuery = "DELETE FROM film_genre where film_id = ?";
                 jdbcTemplate.update(sqlQuery, film.getId());
-                for (Genres genres :
+                for (Genre genre :
                         film.getGenres()) {
                     sqlQuery = "MERGE INTO film_genre key(film_id, genre_id) values (?, ?)";
-                    jdbcTemplate.update(sqlQuery, film.getId(), genres.getId());
+                    jdbcTemplate.update(sqlQuery, film.getId(), genre.getId());
                 }
             }
             return findById(film.getId());
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Фильм с id=%d не найден.", film.getId()));
+            throw new NotFoundException(String.format("Film with id=%d not found.", film.getId()));
         }
     }
 
@@ -100,7 +100,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             film = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToFilm, filmId);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Фильм с id=%d не найден.", filmId));
+            throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
         }
         return film;
     }
@@ -108,7 +108,7 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public boolean isExist(Long id) {
         if (findById(id) == null) {
-            throw new NotFoundException("Film with id=" + id + " not found");
+            throw new NotFoundException(String.format("Film with id=%d not found.", id));
         }
         return true;
     }

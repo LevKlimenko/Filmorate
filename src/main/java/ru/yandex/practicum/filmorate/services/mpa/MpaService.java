@@ -25,7 +25,4 @@ public class MpaService {
         return mpaDbStorage.findMpaById(id);
     }
 
-    public Map<Long, Mpa> getMap() {
-        return null;
-    }
 }

@@ -40,7 +40,7 @@ public class FilmDbService implements FilmLikeService {
         String sqlQuery = "DELETE from LIKES WHERE FILM_ID=? AND USER_ID=?";
         int row = jdbcTemplate.update(sqlQuery, filmId, userId);
         if (row == 0) {
-            throw new NotFoundException("User like for film not found. " + "filmId:" + filmId + " userId:" + userId);
+            throw new NotFoundException("User like for film not found. filmId:" + filmId + " userId:" + userId);
         }
         return true;
     }

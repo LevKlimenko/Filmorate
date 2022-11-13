@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storages.mpa;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Mpa;
 
@@ -19,12 +20,15 @@ public class MpaDbStorage {
     }
 
     public Mpa findMpaById(Long id) {
+        if (id==null){
+            throw new BadRequestException("MPA cannot be null");
+        }
         String sqlQuery = " select * from MPA where id = ?";
         Mpa mpa;
         try {
             mpa = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToMpa, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("MPA с id " + id + " не найден");
+            throw new NotFoundException(String.format("Mpa with id=%d not found.", id));
         }
         return mpa;
     }

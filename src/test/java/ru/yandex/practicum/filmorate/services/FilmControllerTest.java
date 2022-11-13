@@ -1,9 +1,7 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.services;
 
 import lombok.RequiredArgsConstructor;
-import org.h2.jdbc.JdbcSQLIntegrityConstraintViolationException;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,18 +10,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
-import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.Mpa;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.services.film.FilmDbService;
-import ru.yandex.practicum.filmorate.services.genres.GenreService;
+import ru.yandex.practicum.filmorate.services.genre.GenreService;
 import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 import ru.yandex.practicum.filmorate.services.user.UserDbService;
-import ru.yandex.practicum.filmorate.storages.film.FilmDbStorage;
 
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
@@ -35,14 +29,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmControllerTest {
-    Film film;
-    User user;
     private final JdbcTemplate jdbcTemplate;
-
     private final FilmDbService filmService;
     private final MpaService mpaService;
     private final GenreService genreService;
     private final UserDbService userDbService;
+    Film film;
+    User user;
 
     @BeforeEach
     void initEach() {
@@ -70,7 +63,7 @@ public class FilmControllerTest {
      */
 
     @Test
-    public void postStandartFilm() {
+    public void postStandardFilm() {
         film = Film.builder()
                 .name("testFilm")
                 .description("testWithNameDiscr")
@@ -86,7 +79,7 @@ public class FilmControllerTest {
     }
 
     @Test
-    public void postTwoStandartFilm() {
+    public void postTwoStandardFilm() {
         film = Film.builder()
                 .name("testFilm")
                 .description("testFilm")
@@ -111,6 +104,85 @@ public class FilmControllerTest {
     }
 
     @Test
+    public void postFailNameFilm() {
+        film = Film.builder()
+                .name("")
+                .description("testWithNameDiscr")
+                .releaseDate(LocalDate.of(2022, 5, 5))
+                .duration(100)
+                .rate(4)
+                .mpa(mpaService.findById(1L))
+                .build();
+        assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
+    }
+
+    @Test
+    public void postNullNameFilm() {
+        film = Film.builder()
+                .description("testWithNameDiscr")
+                .releaseDate(LocalDate.of(2022, 5, 5))
+                .duration(100)
+                .rate(4)
+                .mpa(mpaService.findById(1L))
+                .build();
+        assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
+    }
+
+    @Test
+    public void postFailDescriptionFilm() {
+        film = Film.builder()
+                .name("testFilm")
+                .description("ThisTextHave22Symbols.ThisTextHave22Symbols.ThisTextHave22Symbols.ThisTextHave22Symbols." +
+                        "ThisTextHave22Symbols.ThisTextHave22Symbols.ThisTextHave22Symbols." +
+                        "ThisTextHave22Symbols.ThisTextHave22Symbols....")
+                .releaseDate(LocalDate.of(2022, 5, 5))
+                .duration(100)
+                .rate(4)
+                .mpa(mpaService.findById(1L))
+                .build();
+        assertEquals(201,film.getDescription().length(),"Длина Description не совпадает");
+        assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
+    }
+
+    @Test
+    public void postReleaseDateFailFilm() {
+        film = Film.builder()
+                .name("testFilm")
+                .description("Date release is 1895-12-27")
+                .releaseDate(LocalDate.of(1895,12,27))
+                .duration(100)
+                .rate(4)
+                .mpa(mpaService.findById(1L))
+                .build();
+        assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
+    }
+
+    @Test
+    public void postBadDurationFilm() {
+        film = Film.builder()
+                .name("testFilm")
+                .description("Duration <0")
+                .releaseDate(LocalDate.of(1995,12,27))
+                .duration(-1)
+                .rate(4)
+                .mpa(mpaService.findById(1L))
+                .build();
+        assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
+    }
+
+    @Test
+    public void postWithoutMpaFilm() {
+        film = Film.builder()
+                .name("testFilm")
+                .description("Not Found Mpa")
+                .releaseDate(LocalDate.of(1995,12,27))
+                .duration(100)
+                .rate(4)
+                .build();
+        assertThrows(NullPointerException.class, () -> filmService.create(film), "Фильм добавлен");
+    }
+
+    @Test
     public void getPopularFilm() {
         film = Film.builder()
                 .name("testFilm")
@@ -124,7 +196,7 @@ public class FilmControllerTest {
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(film,filmService.showMostLikedFilms(10).get(0),"Фильмы различаются");
+        assertEquals(film, filmService.showMostLikedFilms(10).get(0), "Фильмы различаются");
     }
 
     @Test
@@ -141,7 +213,7 @@ public class FilmControllerTest {
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals(film,filmService.findById(1L),"Фильмы различаются");
+        assertEquals(film, filmService.findById(1L), "Фильмы различаются");
         assertThrows(NotFoundException.class, () -> filmService.findById(2L), "Фильм найден");
     }
 
@@ -188,7 +260,7 @@ public class FilmControllerTest {
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(1L),filmService.showMostLikedFilms(10).get(0),"Фильмы различаются");
+        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(0), "Фильмы различаются");
         Film film2 = Film.builder()
                 .name("testFilm2")
                 .description("testWithNameDiscr2")
@@ -201,8 +273,8 @@ public class FilmControllerTest {
                 .build();
         filmService.create(film2);
         assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(1L),filmService.showMostLikedFilms(10).get(0),"Фильмы 1 различаются");
-        assertEquals(filmService.findById(2L),filmService.showMostLikedFilms(10).get(1),"Фильмы 2 различаются");
+        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(0), "Фильмы 1 различаются");
+        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(1), "Фильмы 2 различаются");
         user = User.builder()
                 .email("testUser@yandex.ru")
                 .login("testLogin")
@@ -212,8 +284,8 @@ public class FilmControllerTest {
         userDbService.create(user);
         filmService.addLike(film2.getId(), user.getId());
         assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(2L),filmService.showMostLikedFilms(10).get(0),"Фильмы 2 различаются");
-        assertEquals(filmService.findById(1L),filmService.showMostLikedFilms(10).get(1),"Фильмы 1 различаются");
+        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(0), "Фильмы 2 различаются");
+        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(1), "Фильмы 1 различаются");
     }
 
     @Test
@@ -249,12 +321,12 @@ public class FilmControllerTest {
         userDbService.create(user);
         filmService.addLike(film2.getId(), user.getId());
         assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(2L),filmService.showMostLikedFilms(10).get(0),"Фильмы 2 различаются");
-        assertEquals(filmService.findById(1L),filmService.showMostLikedFilms(10).get(1),"Фильмы 1 различаются");
-        filmService.deleteLike(film2.getId(),user.getId());
+        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(0), "Фильмы 2 различаются");
+        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(1), "Фильмы 1 различаются");
+        filmService.deleteLike(film2.getId(), user.getId());
         assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(1L),filmService.showMostLikedFilms(10).get(0),"Фильмы 1 различаются");
-        assertEquals(filmService.findById(2L),filmService.showMostLikedFilms(10).get(1),"Фильмы 2 различаются");
+        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(0), "Фильмы 1 различаются");
+        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(1), "Фильмы 2 различаются");
     }
 
     @Test
@@ -294,8 +366,6 @@ public class FilmControllerTest {
         assertThrows(NotFoundException.class, () -> filmService.deleteLike(2L, 3L), "Пользователь найден");
     }
 
-
-
     /**
      * Test PUT
      */
@@ -315,7 +385,7 @@ public class FilmControllerTest {
         Film film2 = Film.builder()
                 .id((long) 1)
                 .name("testFilm")
-                .description("testAlreadyExistFilm")
+                .description("testUpdateDescFilm")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .rate(4)
@@ -323,6 +393,7 @@ public class FilmControllerTest {
                 .build();
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
+        assertEquals("testUpdateDescFilm",filmService.findById(1L).getDescription(),"Фильмы не совпадают");
     }
 
     @Test
@@ -339,16 +410,16 @@ public class FilmControllerTest {
         Film film2 = Film.builder()
                 .id((long) -1)
                 .name("testFilm")
-                .description("testAlreadyExistFilm")
+                .description("testBadID -1")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .rate(4)
                 .mpa(mpaService.findById(1L))
                 .build();
         Film film3 = Film.builder()
-                .id((long) -2)
+                .id((long) 2)
                 .name("testFilm")
-                .description("testAlreadyExistFilm")
+                .description("testBadId 2")
                 .releaseDate(LocalDate.of(2022, 1, 1))
                 .duration(50)
                 .rate(4)
@@ -357,6 +428,4 @@ public class FilmControllerTest {
         assertThrows(NotFoundException.class, () -> filmService.update(film2), "Фильм обновлен");
         assertThrows(NotFoundException.class, () -> filmService.update(film3), "Фильм обновлен");
     }
-
-
 }

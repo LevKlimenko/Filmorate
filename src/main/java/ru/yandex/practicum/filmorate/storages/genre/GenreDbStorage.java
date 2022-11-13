@@ -4,7 +4,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
-import ru.yandex.practicum.filmorate.models.Genres;
+import ru.yandex.practicum.filmorate.models.Genre;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,35 +18,35 @@ public class GenreDbStorage {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public Genres findGenreById(Long id) {
+    public Genre findGenreById(Long id) {
         String sqlQuery = " select * from genres where id = ?";
-        Genres genres;
+        Genre genre;
         try {
-            genres = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
+            genre = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToGenre, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Genre с id " + id + " не найден");
+            throw new NotFoundException(String.format("Genre with id=%d not found.", id));
         }
-        return genres;
+        return genre;
     }
 
-    public List<Genres> findAllGenre() {
+    public List<Genre> findAllGenre() {
         String sqlQuery = "SELECT * from genres";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
 
-    public List<Genres> findGenresOfFilm(Long id) {
-        List<Genres> genres;
+    public List<Genre> findGenresOfFilm(Long id) {
+        List<Genre> genres;
         try {
             String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
             genres = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Жанр с id " + id + " не найден");
+            throw new NotFoundException(String.format("Genre with id=%d not found.", id));
         }
         return genres;
     }
 
-    private Genres mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
-        return Genres.builder()
+    private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {
+        return Genre.builder()
                 .id(resultSet.getLong("id"))
                 .name(resultSet.getString("name"))
                 .build();

@@ -74,7 +74,7 @@ public class UserDbStorage implements UserStorage {
         try {
             user = jdbcTemplate.queryForObject(sqlQuery, this::mapRowToUser, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Пользователь с id=%d не найден.", id));
+            throw new NotFoundException(String.format("User with id=%d not found.", id));
         }
         return user;
     }
@@ -82,7 +82,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public boolean isExist(Long id) {
         if (findById(id) == null) {
-            throw new NotFoundException("User with id=" + id + " not found");
+            throw new NotFoundException(String.format("User with id=%d not found.", id));
         }
         return true;
     }

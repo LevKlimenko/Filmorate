@@ -24,6 +24,8 @@ CREATE TABLE IF NOT EXISTS films
         CHECK (duration >= 0),
     CONSTRAINT space_name
         CHECK (name NOT LIKE ' ' and name NOT LIKE ''),
+    CONSTRAINT date_release
+        check (releaseDate>'1895-12-27'),
     CONSTRAINT "films_mpa_foreign" FOREIGN KEY (mpa) REFERENCES mpa (id)
 );
 

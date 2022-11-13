@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate;
+package ru.yandex.practicum.filmorate.services;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.AfterEach;
@@ -13,10 +13,8 @@ import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.services.user.UserDbService;
-import ru.yandex.practicum.filmorate.storages.user.UserDbStorage;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,10 +24,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 class UserControllerTest {
 
-    User user;
     private final JdbcTemplate jdbcTemplate;
-
     private final UserDbService userService;
+    User user;
 
     @AfterEach
     void tearDown() {
@@ -259,5 +256,10 @@ class UserControllerTest {
         userService.update(user2);
         assertEquals(user2.getLogin(), user2.getName(), "Имя и Логин не совпадают");
     }
+
+    /**
+     * TEST FRIENDS
+     */
+
 
 }
