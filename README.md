@@ -41,10 +41,10 @@ LIMIT 10;
 ---------------------------
 
 получение друзей пользователя:  
-SELECT fr.name  
+SELECT * 
 FROM user AS u  
 RIGHT JOIN  user_friend AS fr ON fr.user1_id=u.id  
 LEFT JOIN user AS u2 ON fr.user2_id = u2.id  
-WHERE u.id = 1 and fr.status = 'APPROVED'  
+WHERE u.id = 1
 
-![This is an image](https://github.com/LevKlimenko/java-filmorate/blob/film-bd/Sprint11Scheme.png)
+![This is an image](https://github.com/LevKlimenko/java-filmorate/blob/add-database/Sprint11SchemeWithRate.png?raw=true)
