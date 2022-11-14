@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.storages.film;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.Genre;
@@ -42,6 +44,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
+        if (film.getMpa() == null ){
+            throw new DataIntegrityViolationException("MPA can't be null");
+        }
         String sqlQuery = "insert into films(name,releaseDate,description,duration,rate,mpa) values(?,?,?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -69,6 +74,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film update(Film film) {
+        if (film.getMpa() == null ){
+            throw new DataIntegrityViolationException("MPA can't be null");
+        }
         String sqlQuery = "UPDATE films set name = ?, releaseDate = ?, description =?, duration = ?,rate=?, mpa = ? " +
                 "where id = ?";
         try {
@@ -115,7 +123,7 @@ public class FilmDbStorage implements FilmStorage {
         return true;
     }
 
-    public Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getLong("id"))
                 .name((resultSet.getString("name")))

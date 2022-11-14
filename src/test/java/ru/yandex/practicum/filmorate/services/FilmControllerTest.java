@@ -180,7 +180,7 @@ public class FilmControllerTest {
                 .rate(4)
                 .mpa(null)
                 .build();
-        assertThrows(NullPointerException.class, () -> filmService.create(film), "Фильм добавлен");
+        assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
     }
 
     @Test

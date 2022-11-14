@@ -30,7 +30,6 @@ public class FilmDbService implements FilmLikeService {
         userStorage.isExist(userId);
         String sqlQuery = "MERGE INTO LIKES key(FILM_ID,USER_ID) values (?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, userId);
-
     }
 
     @Override
@@ -55,7 +54,6 @@ public class FilmDbService implements FilmLikeService {
         return filmStorage.getFilms(filmsRows);
     }
 
-
     @Override
     public Collection<Film> getAll() {
         return filmStorage.getAll();
@@ -65,6 +63,7 @@ public class FilmDbService implements FilmLikeService {
     public Film create(Film film) {
         return filmStorage.create(film);
     }
+
 
     @Override
     public Film update(Film film) {
