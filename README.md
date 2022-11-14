@@ -47,4 +47,4 @@ RIGHT JOIN  user_friend AS fr ON fr.user1_id=u.id
 LEFT JOIN user AS u2 ON fr.user2_id = u2.id  
 WHERE u.id = 1
 
-![This is an image](https://github.com/LevKlimenko/java-filmorate/blob/add-database/Sprint11SchemeWithRate.png?raw=true)
+![This is an image](https://github.com/LevKlimenko/java-filmorate/blob/main/Sprint11SchemeWithRate.png?raw=true)
