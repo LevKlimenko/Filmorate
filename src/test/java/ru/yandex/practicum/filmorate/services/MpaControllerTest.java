@@ -11,7 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Mpa;
-import ru.yandex.practicum.filmorate.services.mpa.MpaService;
+import ru.yandex.practicum.filmorate.services.mpa.MpaStorageInterface;
 
 import java.util.Collection;
 
@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class MpaControllerTest {
     private final JdbcTemplate jdbcTemplate;
 
-    private final MpaService mpaService;
+    private final MpaStorageInterface mpaService;
 
     @BeforeEach
     void initEach() {

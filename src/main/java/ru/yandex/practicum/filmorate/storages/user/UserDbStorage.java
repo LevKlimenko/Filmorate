@@ -1,11 +1,13 @@
 package ru.yandex.practicum.filmorate.storages.user;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
@@ -16,14 +18,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-@Qualifier("userDbStorage")
-@Component
+@Repository
+@RequiredArgsConstructor
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-
-    public UserDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
 
     @Override
     public Collection<User> getAll() {
@@ -33,7 +31,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User create(User user) {
-        checkBlankAndNullName(user);
         String sqlQuery = "insert into users(login, name,email, birthday) values (?,?,?,?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -55,7 +52,6 @@ public class UserDbStorage implements UserStorage {
             throw new BadRequestException("Can't update user without ID");
         }
         isExist(user.getId());
-        checkBlankAndNullName(user);
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday =?" +
                 "where id = ?";
         jdbcTemplate.update(sqlQuery
@@ -87,6 +83,14 @@ public class UserDbStorage implements UserStorage {
         return true;
     }
 
+    public List<User> getUsers(List<Long> userId) {
+        String inSql = String.join(",", Collections.nCopies(userId.size(), "?"));
+        return jdbcTemplate.query(String.format("SELECT * FROM users WHERE id in (%s)", inSql),
+                this::mapRowToUser,
+                userId.toArray());
+    }
+
+
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("id"))
@@ -101,18 +105,5 @@ public class UserDbStorage implements UserStorage {
     private List<Long> findUsersFriends(Long id) {
         String sqlQuery = "SELECT FRIEND_ID FROM friendship WHERE USER_ID = ?";
         return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
-    }
-
-    public List<User> getUsers(List<Long> userId) {
-        String inSql = String.join(",", Collections.nCopies(userId.size(), "?"));
-        return jdbcTemplate.query(String.format("SELECT * FROM users WHERE id in (%s)", inSql),
-                this::mapRowToUser,
-                userId.toArray());
-    }
-
-    private void checkBlankAndNullName(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
     }
 }

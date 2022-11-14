@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.storages.genre;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Genre;
 
@@ -10,14 +12,12 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-@Component
-public class GenreDbStorage {
+@Repository
+@RequiredArgsConstructor
+public class GenreDbStorage implements GenreStorageInterface {
     private final JdbcTemplate jdbcTemplate;
 
-    public GenreDbStorage(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
+    @Override
     public Genre findGenreById(Long id) {
         String sqlQuery = " select * from genres where id = ?";
         Genre genre;
@@ -29,11 +29,13 @@ public class GenreDbStorage {
         return genre;
     }
 
+    @Override
     public List<Genre> findAllGenre() {
         String sqlQuery = "SELECT * from genres";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }
 
+    @Override
     public List<Genre> findGenresOfFilm(Long id) {
         List<Genre> genres;
         try {

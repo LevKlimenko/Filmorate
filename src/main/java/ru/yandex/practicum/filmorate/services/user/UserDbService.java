@@ -70,16 +70,24 @@ public class UserDbService implements UserFriendService {
 
     @Override
     public User create(User user) {
+        checkBlankAndNullName(user);
         return userDbStorage.create(user);
     }
 
     @Override
     public User update(User user) {
+        checkBlankAndNullName(user);
         return userDbStorage.update(user);
     }
 
     @Override
     public User findById(Long id) {
         return userDbStorage.findById(id);
+    }
+
+    private void checkBlankAndNullName(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
     }
 }

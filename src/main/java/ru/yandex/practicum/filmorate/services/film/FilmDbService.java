@@ -6,7 +6,9 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.storages.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storages.user.UserDbStorage;
+import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -14,11 +16,11 @@ import java.util.List;
 @Service
 public class FilmDbService implements FilmLikeService {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmDbStorage filmStorage;
-    private final UserDbStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmDbService(JdbcTemplate jdbcTemplate, FilmDbStorage filmStorage, UserDbStorage userStorage) {
+    public FilmDbService(JdbcTemplate jdbcTemplate, FilmStorage filmStorage, UserStorage userStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;

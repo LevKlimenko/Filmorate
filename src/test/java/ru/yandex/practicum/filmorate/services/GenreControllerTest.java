@@ -14,8 +14,8 @@ import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.Genre;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.services.film.FilmDbService;
-import ru.yandex.practicum.filmorate.services.genre.GenreService;
-import ru.yandex.practicum.filmorate.services.mpa.MpaService;
+import ru.yandex.practicum.filmorate.services.genre.GenreStorageInterface;
+import ru.yandex.practicum.filmorate.services.mpa.MpaStorageInterface;
 import ru.yandex.practicum.filmorate.services.user.UserDbService;
 
 import java.time.LocalDate;
@@ -33,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class GenreControllerTest {
     private final JdbcTemplate jdbcTemplate;
     private final FilmDbService filmService;
-    private final MpaService mpaService;
-    private final GenreService genreService;
+    private final MpaStorageInterface mpaService;
+    private final GenreStorageInterface genreService;
     private final UserDbService userDbService;
     Film film;
     User user;
