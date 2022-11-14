@@ -66,7 +66,7 @@ public class MpaControllerTest {
     }
 
     @Test
-    public void getBadIdMpa(){
-        assertThrows(NotFoundException.class,() ->mpaService.findById(10L), "MPA найден");
+    public void getBadIdMpa() {
+        assertThrows(NotFoundException.class, () -> mpaService.findById(10L), "MPA найден");
     }
 }

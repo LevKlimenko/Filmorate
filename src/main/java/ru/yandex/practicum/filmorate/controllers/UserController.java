@@ -70,4 +70,3 @@ public class UserController {
         return userService.showIntersectionFriends(userId1, userId2);
     }
 }
-

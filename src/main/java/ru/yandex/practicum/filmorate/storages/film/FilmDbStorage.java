@@ -12,7 +12,10 @@ import ru.yandex.practicum.filmorate.models.Genre;
 import ru.yandex.practicum.filmorate.services.genre.GenreService;
 import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +27,6 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final MpaService mpaService;
     private final GenreService genreService;
-
 
     public FilmDbStorage(JdbcTemplate jdbcTemplate, MpaService mpaService, GenreService genreService) {
         this.jdbcTemplate = jdbcTemplate;
@@ -49,7 +51,7 @@ public class FilmDbStorage implements FilmStorage {
             ps.setString(3, film.getDescription());
             ps.setInt(4, film.getDuration());
             ps.setInt(5, film.getRate());
-            ps.setInt(6, Math.toIntExact(film.getMpa().getId()));
+            ps.setLong(6, film.getMpa().getId());
             return ps;
         }, keyHolder);
         long id = Objects.requireNonNull((keyHolder.getKey()).longValue());
@@ -126,7 +128,6 @@ public class FilmDbStorage implements FilmStorage {
                 .likesId(findUsersIdWhoLikedFilm(resultSet.getLong("id")))
                 .build();
     }
-
 
     @Override
     public List<Film> getFilms(List<Long> filmsId) {

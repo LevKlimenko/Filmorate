@@ -78,12 +78,12 @@ public class GenreControllerTest {
     }
 
     @Test
-    public void getBadIdGenre(){
-        assertThrows(NotFoundException.class,() ->genreService.findById(10L), "Genre найден");
+    public void getBadIdGenre() {
+        assertThrows(NotFoundException.class, () -> genreService.findById(10L), "Genre найден");
     }
 
     @Test
-    public void postNormalFilmWithOneGenre(){
+    public void postNormalFilmWithOneGenre() {
         List<Genre> genreList = new ArrayList<>();
         genreList.add(genreService.findById(1L));
         film = Film.builder()
@@ -98,11 +98,11 @@ public class GenreControllerTest {
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals("Комедия",filmService.findById(1L).getGenres().get(0).getName(),"Названия жанров не совпадают ");
+        assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
-    public void postNormalFilmWithTwoGenre(){
+    public void postNormalFilmWithTwoGenre() {
         List<Genre> genreList = new ArrayList<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(2L));
@@ -118,8 +118,8 @@ public class GenreControllerTest {
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals(2,filmService.findById(1L).getGenres().size(),"Количество жанров не совпадают ");
-        assertEquals("Драма",filmService.findById(1L).getGenres().get(1).getName(),"Названия жанров не совпадают ");
+        assertEquals(2, filmService.findById(1L).getGenres().size(), "Количество жанров не совпадают ");
+        assertEquals("Драма", filmService.findById(1L).getGenres().get(1).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
@@ -148,11 +148,11 @@ public class GenreControllerTest {
                 .build();
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals("Комедия",filmService.findById(1L).getGenres().get(0).getName(),"Названия жанров не совпадают ");
-       }
+        assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
+    }
 
     @Test
-    public void putNormalFilmWithTwoGenre(){
+    public void putNormalFilmWithTwoGenre() {
         List<Genre> genreList = new ArrayList<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(2L));
@@ -180,8 +180,8 @@ public class GenreControllerTest {
                 .build();
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals(3,filmService.findById(1L).getGenres().size(),"Количество жанров не совпадают ");
-        assertEquals("Мультфильм",filmService.findById(1L).getGenres().get(2).getName(),"Названия жанров не совпадают ");
+        assertEquals(3, filmService.findById(1L).getGenres().size(), "Количество жанров не совпадают ");
+        assertEquals("Мультфильм", filmService.findById(1L).getGenres().get(2).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
@@ -222,11 +222,11 @@ public class GenreControllerTest {
                 .build();
         filmService.update(film3);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals(0,filmService.findById(1L).getGenres().size(),"Список жанров не совпадает ");
+        assertEquals(0, filmService.findById(1L).getGenres().size(), "Список жанров не совпадает ");
     }
 
     @Test
-    public void deleteGenreFilmWithThreeGenre(){
+    public void deleteGenreFilmWithThreeGenre() {
         List<Genre> genreList = new ArrayList<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(2L));
@@ -255,6 +255,6 @@ public class GenreControllerTest {
                 .build();
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals(0,filmService.findById(1L).getGenres().size(),"Количество жанров не совпадают ");
+        assertEquals(0, filmService.findById(1L).getGenres().size(), "Количество жанров не совпадают ");
     }
 }

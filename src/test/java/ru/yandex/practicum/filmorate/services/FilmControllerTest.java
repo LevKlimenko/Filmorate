@@ -140,7 +140,7 @@ public class FilmControllerTest {
                 .rate(4)
                 .mpa(mpaService.findById(1L))
                 .build();
-        assertEquals(201,film.getDescription().length(),"Длина Description не совпадает");
+        assertEquals(201, film.getDescription().length(), "Длина Description не совпадает");
         assertThrows(DataIntegrityViolationException.class, () -> filmService.create(film), "Фильм добавлен");
     }
 
@@ -149,7 +149,7 @@ public class FilmControllerTest {
         film = Film.builder()
                 .name("testFilm")
                 .description("Date release is 1895-12-27")
-                .releaseDate(LocalDate.of(1895,12,27))
+                .releaseDate(LocalDate.of(1895, 12, 27))
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(1L))
@@ -162,7 +162,7 @@ public class FilmControllerTest {
         film = Film.builder()
                 .name("testFilm")
                 .description("Duration <0")
-                .releaseDate(LocalDate.of(1995,12,27))
+                .releaseDate(LocalDate.of(1995, 12, 27))
                 .duration(-1)
                 .rate(4)
                 .mpa(mpaService.findById(1L))
@@ -175,9 +175,10 @@ public class FilmControllerTest {
         film = Film.builder()
                 .name("testFilm")
                 .description("Not Found Mpa")
-                .releaseDate(LocalDate.of(1995,12,27))
+                .releaseDate(LocalDate.of(1995, 12, 27))
                 .duration(100)
                 .rate(4)
+                .mpa(null)
                 .build();
         assertThrows(NullPointerException.class, () -> filmService.create(film), "Фильм добавлен");
     }
@@ -393,7 +394,7 @@ public class FilmControllerTest {
                 .build();
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals("testUpdateDescFilm",filmService.findById(1L).getDescription(),"Фильмы не совпадают");
+        assertEquals("testUpdateDescFilm", filmService.findById(1L).getDescription(), "Фильмы не совпадают");
     }
 
     @Test

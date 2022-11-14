@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
+import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 import ru.yandex.practicum.filmorate.services.user.UserDbService;
@@ -261,5 +262,198 @@ class UserControllerTest {
      * TEST FRIENDS
      */
 
+    @Test
+    public void checkFriendsWithoutAdd() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        User user2 = User.builder()
+                .email("testUser2@yandex.ru")
+                .login("testLogin2")
+                .name("user2")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user2);
+        assertEquals(0, userService.showAllUserFriends(1L).size(), "Количество друзей пользователя 1 неверное");
+        assertEquals(0, userService.showAllUserFriends(2L).size(), "Количество друзей пользователя 2 неверное");
+    }
 
+    @Test
+    public void addNormalUser1AsFriendUser2() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        User user2 = User.builder()
+                .email("testUser2@yandex.ru")
+                .login("testLogin2")
+                .name("user2")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user2);
+        userService.becomeFriend(user.getId(), user2.getId());
+        assertEquals(1, userService.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 отличается");
+        assertEquals(userService.findById(user2.getId()), userService.showAllUserFriends(1L).get(0), "Друг пользователя 1 отличается");
+        assertEquals(0, userService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 отличается");
+    }
+
+    @Test
+    public void addUser1FriendHimself() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        assertThrows(ConflictException.class, () -> userService.becomeFriend(user.getId(), user.getId()), "Пользователь стал сам себе другом");
+    }
+
+    @Test
+    public void addAgainUser1AsFriendUser2() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        User user2 = User.builder()
+                .email("testUser2@yandex.ru")
+                .login("testLogin2")
+                .name("user2")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user2);
+        userService.becomeFriend(user.getId(), user2.getId());
+        assertThrows(ConflictException.class, () -> userService.becomeFriend(user.getId(), user2.getId()), "Пользователь опять добавил друга в друзья");
+    }
+
+    @Test
+    public void deleteNormalUser1AsFriendNotFoundUser2() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        assertThrows(NotFoundException.class, () -> userService.stopBeingFriends(user.getId(), -5L), "Дружба прекращена");
+    }
+
+    @Test
+    public void addNormalUser1AsFriendNotFoundUser2() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        assertThrows(NotFoundException.class, () -> userService.becomeFriend(user.getId(), -5L), "Пользователи стали друзьями");
+    }
+
+    @Test
+    public void addNormalUser1AsFriendUser2matual() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        User user2 = User.builder()
+                .email("testUser2@yandex.ru")
+                .login("testLogin2")
+                .name("user2")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user2);
+        userService.becomeFriend(user.getId(), user2.getId());
+        userService.becomeFriend(user2.getId(), user.getId());
+        assertEquals(1, userService.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 отличается");
+        assertEquals(userService.findById(user2.getId()), userService.showAllUserFriends(1L).get(0), "Друг пользователя 1 отличается");
+        assertEquals(1, userService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 отличается");
+        assertEquals(userService.findById(user.getId()), userService.showAllUserFriends(2L).get(0), "Друг пользователя 2 отличается");
+    }
+
+    @Test
+    public void addNormalUser1AsFriendUser2AndUser3() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        User user2 = User.builder()
+                .email("testUser2@yandex.ru")
+                .login("testLogin2")
+                .name("user2")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user2);
+        User user3 = User.builder()
+                .email("testUser3@yandex.ru")
+                .login("testLogin3")
+                .name("user3")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user3);
+        userService.becomeFriend(user.getId(), user2.getId());
+        userService.becomeFriend(user.getId(), user3.getId());
+        assertEquals(2, userService.showAllUserFriends(1L).size());
+        assertEquals(userService.findById(user2.getId()), userService.showAllUserFriends(1L).get(0), "Дружба 1-2 различается");
+        assertEquals(userService.findById(user3.getId()), userService.showAllUserFriends(1L).get(1), "Дружба 1-3 различается");
+        assertEquals(0, userService.showAllUserFriends(3L).size(), "Количество друзей у пользователя 3 не совпалает");
+    }
+
+    @Test
+    public void addUsersAsFriendGetIntersectionAndDeleteFriend() {
+        user = User.builder()
+                .email("testUser@yandex.ru")
+                .login("testLogin")
+                .name("testName")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user);
+        User user2 = User.builder()
+                .email("testUser2@yandex.ru")
+                .login("testLogin2")
+                .name("user2")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user2);
+        User user3 = User.builder()
+                .email("testUser3@yandex.ru")
+                .login("testLogin3")
+                .name("user3")
+                .birthday(LocalDate.of(2000, 10, 10))
+                .build();
+        userService.create(user3);
+        userService.becomeFriend(user.getId(), user2.getId());
+        userService.becomeFriend(user.getId(), user3.getId());
+        userService.becomeFriend(user2.getId(), user3.getId());
+        assertEquals(2, userService.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 не совпадает");
+        assertEquals(1, userService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 не совпадает");
+        assertEquals(userService.findById(user2.getId()), userService.showAllUserFriends(1L).get(0), "Дружба 1-2 не совпадает");
+        assertEquals(userService.findById(user3.getId()), userService.showAllUserFriends(1L).get(1), "Дружба 1-3 не совпадает");
+        assertEquals(userService.findById(user3.getId()), userService.showAllUserFriends(2L).get(0), "Дружба 2-3 не совпадает");
+        assertEquals(1, userService.showIntersectionFriends(user.getId(), user2.getId()).size(),
+                "Количество общих друзей различается");
+        assertEquals(userService.findById(user3.getId()),
+                userService.showIntersectionFriends(user.getId(), user2.getId()).get(0), "Общие друзья у пользователей 1 и 2 не совпадают");
+        assertEquals(0, userService.showAllUserFriends(3L).size(), "Количество друзей у пользователя 3 не совпадает");
+        userService.stopBeingFriends(user2.getId(), user3.getId());
+        assertEquals(0, userService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 не совпадает");
+        assertEquals(0, userService.showIntersectionFriends(user.getId(), user2.getId()).size(),
+                "Количество общих друзей различается");
+    }
 }

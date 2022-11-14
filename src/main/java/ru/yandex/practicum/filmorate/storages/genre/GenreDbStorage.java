@@ -51,5 +51,4 @@ public class GenreDbStorage {
                 .name(resultSet.getString("name"))
                 .build();
     }
-
 }

@@ -21,15 +21,16 @@ public class UserDbService implements UserFriendService {
 
     @Override
     public void becomeFriend(Long userId1, Long userId2) {
-        if (userId1.equals(userId2)) {
-            throw new ConflictException("Сan't add yourself as a friend");
-        }
         if (userDbStorage.isExist(userId1) && userDbStorage.isExist(userId2)) {
-            String sqlQuery = "MERGE INTO FRIENDSHIP key(USER_ID, FRIEND_ID) values(?,?)";
-            int row = jdbcTemplate.update(sqlQuery, userId1, userId2);
-            if (row == 0) {
+            if (userId1.equals(userId2)) {
+                throw new ConflictException("Сan't add yourself as a friend");
+            }
+            User user = findById(userId1);
+            if (user.getFriendsId().contains(userId2)) {
                 throw new ConflictException("User id:" + userId1 + " and user id:" + userId2 + " already friends");
             }
+            String sqlQuery = "MERGE INTO FRIENDSHIP key(USER_ID, FRIEND_ID) values(?,?)";
+            jdbcTemplate.update(sqlQuery, userId1, userId2);
         }
     }
 

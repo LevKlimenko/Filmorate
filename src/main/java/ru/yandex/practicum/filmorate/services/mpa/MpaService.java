@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.models.Mpa;
 import ru.yandex.practicum.filmorate.storages.mpa.MpaDbStorage;
 
 import java.util.Collection;
-import java.util.Map;
 
 @Service
 public class MpaService {
@@ -24,5 +23,4 @@ public class MpaService {
     public Mpa findById(Long id) {
         return mpaDbStorage.findMpaById(id);
     }
-
 }
