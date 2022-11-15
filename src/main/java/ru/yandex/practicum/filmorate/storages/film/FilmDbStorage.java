@@ -158,13 +158,11 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void mergeFilmGenres(Film film) {
-        for (Genre genre :
-                film.getGenres()) {
-            jdbcTemplate.batchUpdate("MERGE INTO film_genre key(film_id, genre_id) values (?, ?)", new BatchPreparedStatementSetter() {
+             jdbcTemplate.batchUpdate("MERGE INTO film_genre key(film_id, genre_id) values (?, ?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
                     ps.setLong(1, film.getId());
-                    ps.setLong(2, genre.getId());
+                    ps.setLong(2, film.getGenres().get(i).getId());
                 }
 
                 @Override
@@ -173,7 +171,6 @@ public class FilmDbStorage implements FilmStorage {
                 }
             });
         }
-    }
 
     private List<Genre> removeDuplicateGenre(List<Genre> lg) {
         List<Genre> withoutDuplicateList = new ArrayList<>();
