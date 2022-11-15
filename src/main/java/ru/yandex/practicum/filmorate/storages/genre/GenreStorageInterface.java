@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface GenreStorageInterface {
     Genre findGenreById(Long id);
+
     List<Genre> findAllGenre();
-    List<Genre> findGenresOfFilm(Long id);
 }

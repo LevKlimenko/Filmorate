@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.services.user.UserDbService;
+import ru.yandex.practicum.filmorate.services.CrudService;
 import ru.yandex.practicum.filmorate.services.user.UserFriendService;
 
 import javax.validation.Valid;
@@ -19,7 +18,8 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserFriendService userService;
+    private final UserFriendService userFriendService;
+    private final CrudService<User> userService;
 
     @GetMapping
     public Collection<User> getAllUser() {
@@ -28,11 +28,13 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
+        checkBlankAndNullName(user);
         return userService.create(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
+        checkBlankAndNullName(user);
         return userService.update(user);
     }
 
@@ -44,25 +46,31 @@ public class UserController {
     @PutMapping("/{user1}/friends/{user2}")
     public User addFriends(@PathVariable("user1") Long userId1,
                            @PathVariable("user2") Long userId2) {
-        userService.becomeFriend(userId1, userId2);
+        userFriendService.becomeFriend(userId1, userId2);
         return userService.findById(userId1);
     }
 
     @DeleteMapping("/{user1}/friends/{user2}")
     public User deleteFriends(@PathVariable("user1") Long userId1,
                               @PathVariable("user2") Long userId2) {
-        userService.stopBeingFriends(userId1, userId2);
+        userFriendService.stopBeingFriends(userId1, userId2);
         return userService.findById(userId1);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> showUserFriends(@PathVariable("id") Long userId) {
-        return userService.showAllUserFriends(userId);
+        return userFriendService.showAllUserFriends(userId);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> showIntersectionFriends(@PathVariable("id") Long userId1,
                                               @PathVariable("otherId") Long userId2) {
-        return userService.showIntersectionFriends(userId1, userId2);
+        return userFriendService.showIntersectionFriends(userId1, userId2);
+    }
+
+    private void checkBlankAndNullName(User user) {
+        if (user.getName() == null || user.getName().isEmpty()) {
+            user.setName(user.getLogin());
+        }
     }
 }

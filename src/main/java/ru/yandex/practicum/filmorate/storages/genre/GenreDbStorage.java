@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storages.genre;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Genre;
@@ -33,18 +32,6 @@ public class GenreDbStorage implements GenreStorageInterface {
     public List<Genre> findAllGenre() {
         String sqlQuery = "SELECT * from genres";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
-    }
-
-    @Override
-    public List<Genre> findGenresOfFilm(Long id) {
-        List<Genre> genres;
-        try {
-            String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
-            genres = jdbcTemplate.query(sqlQuery, this::mapRowToGenre, id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Genre with id=%d not found.", id));
-        }
-        return genres;
     }
 
     private Genre mapRowToGenre(ResultSet resultSet, int rowNum) throws SQLException {

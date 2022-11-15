@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storages.mpa;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Mpa;
@@ -14,7 +13,7 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MpaDbStorage implements MpaStorageInterface{
+public class MpaDbStorage implements MpaStorageInterface {
     private final JdbcTemplate jdbcTemplate;
 
     @Override

@@ -1,11 +1,10 @@
 package ru.yandex.practicum.filmorate.services.film;
 
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.services.CrudService;
 
 import java.util.List;
 
-public interface FilmLikeService extends CrudService<Film> {
+public interface FilmLikeService {
 
     void addLike(Long filmId, Long userId);
 

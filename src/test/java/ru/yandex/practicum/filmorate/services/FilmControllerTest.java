@@ -13,13 +13,13 @@ import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.services.film.FilmDbService;
-import ru.yandex.practicum.filmorate.services.genre.GenreStorageInterface;
-import ru.yandex.practicum.filmorate.services.mpa.MpaStorageInterface;
-import ru.yandex.practicum.filmorate.services.user.UserDbService;
+import ru.yandex.practicum.filmorate.services.film.FilmLikeService;
+import ru.yandex.practicum.filmorate.services.genre.GenreService;
+import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,10 +30,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class FilmControllerTest {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmDbService filmService;
-    private final MpaStorageInterface mpaService;
-    private final GenreStorageInterface genreService;
-    private final UserDbService userDbService;
+    private final FilmLikeService filmLikeService;
+    private final CrudService<Film> filmService;
+    private final MpaService mpaService;
+    private final GenreService genreService;
+    private final CrudService<User> userDbService;
     Film film;
     User user;
 
@@ -196,8 +197,8 @@ public class FilmControllerTest {
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film);
-        assertEquals(1, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(film, filmService.showMostLikedFilms(10).get(0), "Фильмы различаются");
+        assertEquals(1, filmLikeService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
+        assertEquals(film, filmLikeService.showMostLikedFilms(10).get(0), "Фильмы различаются");
     }
 
     @Test
@@ -209,7 +210,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film);
@@ -231,7 +232,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .build();
         filmService.create(film);
         user = User.builder()
@@ -241,7 +242,7 @@ public class FilmControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userDbService.create(user);
-        filmService.addLike(film.getId(), user.getId());
+        filmLikeService.addLike(film.getId(), user.getId());
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
         assertEquals(1, filmService.findById(1L).getLikesId().size(), "Количество лайков отличается");
         assertEquals(user.getId(), filmService.findById(1L).getLikesId().get(0), "Количество лайков отличается");
@@ -256,12 +257,12 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film);
-        assertEquals(1, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(0), "Фильмы различаются");
+        assertEquals(1, filmLikeService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
+        assertEquals(filmService.findById(1L), filmLikeService.showMostLikedFilms(10).get(0), "Фильмы различаются");
         Film film2 = Film.builder()
                 .name("testFilm2")
                 .description("testWithNameDiscr2")
@@ -269,13 +270,13 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film2);
-        assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(0), "Фильмы 1 различаются");
-        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(1), "Фильмы 2 различаются");
+        assertEquals(2, filmLikeService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
+        assertEquals(filmService.findById(1L), filmLikeService.showMostLikedFilms(10).get(0), "Фильмы 1 различаются");
+        assertEquals(filmService.findById(2L), filmLikeService.showMostLikedFilms(10).get(1), "Фильмы 2 различаются");
         user = User.builder()
                 .email("testUser@yandex.ru")
                 .login("testLogin")
@@ -283,10 +284,10 @@ public class FilmControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userDbService.create(user);
-        filmService.addLike(film2.getId(), user.getId());
-        assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(0), "Фильмы 2 различаются");
-        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(1), "Фильмы 1 различаются");
+        filmLikeService.addLike(film2.getId(), user.getId());
+        assertEquals(2, filmLikeService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
+        assertEquals(filmService.findById(2L), filmLikeService.showMostLikedFilms(10).get(0), "Фильмы 2 различаются");
+        assertEquals(filmService.findById(1L), filmLikeService.showMostLikedFilms(10).get(1), "Фильмы 1 различаются");
     }
 
     @Test
@@ -298,7 +299,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film);
@@ -309,7 +310,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film2);
@@ -320,14 +321,14 @@ public class FilmControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userDbService.create(user);
-        filmService.addLike(film2.getId(), user.getId());
-        assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(0), "Фильмы 2 различаются");
-        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(1), "Фильмы 1 различаются");
-        filmService.deleteLike(film2.getId(), user.getId());
-        assertEquals(2, filmService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
-        assertEquals(filmService.findById(1L), filmService.showMostLikedFilms(10).get(0), "Фильмы 1 различаются");
-        assertEquals(filmService.findById(2L), filmService.showMostLikedFilms(10).get(1), "Фильмы 2 различаются");
+        filmLikeService.addLike(film2.getId(), user.getId());
+        assertEquals(2, filmLikeService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
+        assertEquals(filmService.findById(2L), filmLikeService.showMostLikedFilms(10).get(0), "Фильмы 2 различаются");
+        assertEquals(filmService.findById(1L), filmLikeService.showMostLikedFilms(10).get(1), "Фильмы 1 различаются");
+        filmLikeService.deleteLike(film2.getId(), user.getId());
+        assertEquals(2, filmLikeService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
+        assertEquals(filmService.findById(1L), filmLikeService.showMostLikedFilms(10).get(0), "Фильмы 1 различаются");
+        assertEquals(filmService.findById(2L), filmLikeService.showMostLikedFilms(10).get(1), "Фильмы 2 различаются");
     }
 
     @Test
@@ -339,7 +340,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film);
@@ -350,7 +351,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(genreService.findGenresOfFilm(1L))
+                .genres(Arrays.asList(genreService.findById(1L)))
                 .likesId(new ArrayList<>())
                 .build();
         filmService.create(film2);
@@ -361,10 +362,10 @@ public class FilmControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userDbService.create(user);
-        filmService.addLike(film2.getId(), user.getId());
-        assertThrows(NotFoundException.class, () -> filmService.deleteLike(2L, 2L), "Лайк удален");
-        assertThrows(NotFoundException.class, () -> filmService.deleteLike(3L, 2L), "Фильм найден");
-        assertThrows(NotFoundException.class, () -> filmService.deleteLike(2L, 3L), "Пользователь найден");
+        filmLikeService.addLike(film2.getId(), user.getId());
+        assertThrows(NotFoundException.class, () -> filmLikeService.deleteLike(2L, 2L), "Лайк удален");
+        assertThrows(NotFoundException.class, () -> filmLikeService.deleteLike(3L, 2L), "Фильм найден");
+        assertThrows(NotFoundException.class, () -> filmLikeService.deleteLike(2L, 3L), "Пользователь найден");
     }
 
     /**

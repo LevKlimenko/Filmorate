@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface MpaStorageInterface {
     Mpa findMpaById(Long id);
+
     List<Mpa> findAllMpa();
 
 }

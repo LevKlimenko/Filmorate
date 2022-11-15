@@ -7,11 +7,11 @@ import ru.yandex.practicum.filmorate.models.Mpa;
 import java.util.Collection;
 
 @Service
-public class MpaStorageInterface implements MpaServiceInterface{
+public class MpaService implements MpaServiceInterface {
     private final ru.yandex.practicum.filmorate.storages.mpa.MpaStorageInterface mpaStorage;
 
     @Autowired
-    public MpaStorageInterface(ru.yandex.practicum.filmorate.storages.mpa.MpaStorageInterface mpaStorage) {
+    public MpaService(ru.yandex.practicum.filmorate.storages.mpa.MpaStorageInterface mpaStorage) {
         this.mpaStorage = mpaStorage;
     }
 

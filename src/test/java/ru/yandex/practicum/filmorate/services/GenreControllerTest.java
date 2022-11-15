@@ -12,11 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.Genre;
-import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.services.film.FilmDbService;
-import ru.yandex.practicum.filmorate.services.genre.GenreStorageInterface;
-import ru.yandex.practicum.filmorate.services.mpa.MpaStorageInterface;
-import ru.yandex.practicum.filmorate.services.user.UserDbService;
+import ru.yandex.practicum.filmorate.services.genre.GenreService;
+import ru.yandex.practicum.filmorate.services.mpa.MpaService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,12 +29,10 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class GenreControllerTest {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmDbService filmService;
-    private final MpaStorageInterface mpaService;
-    private final GenreStorageInterface genreService;
-    private final UserDbService userDbService;
+    private final CrudService<Film> filmService;
+    private final MpaService mpaService;
+    private final GenreService genreService;
     Film film;
-    User user;
 
     @BeforeEach
     void initEach() {
@@ -100,6 +95,27 @@ public class GenreControllerTest {
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
         assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
     }
+
+    @Test
+    public void postNormalFilmWithDuplicateGenre() {
+        List<Genre> genreList = new ArrayList<>();
+        genreList.add(genreService.findById(1L));
+        genreList.add(genreService.findById(1L));
+        film = Film.builder()
+                .name("testFilm")
+                .description("testUpdateGenreFilm")
+                .releaseDate(LocalDate.of(2022, 1, 1))
+                .duration(50)
+                .rate(4)
+                .mpa(mpaService.findById(1L))
+                .genres(genreList)
+                .build();
+        filmService.create(film);
+        assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
+        assertEquals(1, filmService.findById(film.getId()).getGenres().size());
+        assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
+    }
+
 
     @Test
     public void postNormalFilmWithTwoGenre() {

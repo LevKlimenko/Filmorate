@@ -25,7 +25,7 @@ CREATE TABLE IF NOT EXISTS films
     CONSTRAINT space_name
         CHECK (name NOT LIKE ' ' and name NOT LIKE ''),
     CONSTRAINT date_release
-        check (releaseDate>'1895-12-27'),
+        check (releaseDate > '1895-12-27'),
     CONSTRAINT "films_mpa_foreign" FOREIGN KEY (mpa) REFERENCES mpa (id)
 );
 
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS friendship
     friend_id BIGINT NOT NULL,
     CONSTRAINT "friendship_friend_id_foreign" FOREIGN KEY (friend_id) REFERENCES users (id),
     CONSTRAINT "friendship_user_id_foreign" FOREIGN KEY (user_id) REFERENCES users (id),
-    PRIMARY KEY (user_id,friend_id)
+    PRIMARY KEY (user_id, friend_id)
 );
 
 
@@ -69,7 +69,7 @@ CREATE TABLE IF NOT EXISTS likes
     user_id BIGINT NOT NULL,
     CONSTRAINT "likes_film_id_foreign" FOREIGN KEY (film_id) REFERENCES films (id),
     CONSTRAINT "likes_user_id_foreign" FOREIGN KEY (user_id) REFERENCES users (id),
-    PRIMARY KEY (film_id,user_id)
+    PRIMARY KEY (film_id, user_id)
 );
 
 
@@ -79,5 +79,5 @@ CREATE TABLE IF NOT EXISTS film_genre
     genre_id INTEGER NOT NULL,
     CONSTRAINT "film_genre_film_id_foreign" FOREIGN KEY (film_id) REFERENCES FILMS (id),
     CONSTRAINT "film_genre_genre_id_foreign" FOREIGN KEY (genre_id) REFERENCES GENRES (id),
-    PRIMARY KEY (film_id,genre_id)
+    PRIMARY KEY (film_id, genre_id)
 );

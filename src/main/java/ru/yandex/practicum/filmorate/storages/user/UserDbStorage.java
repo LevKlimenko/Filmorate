@@ -1,12 +1,10 @@
 package ru.yandex.practicum.filmorate.storages.user;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
@@ -43,7 +41,7 @@ public class UserDbStorage implements UserStorage {
         }, keyHolder);
         long id = Objects.requireNonNull(keyHolder.getKey()).longValue();
         user.setId(id);
-        return findById(id);
+        return user;
     }
 
     @Override
@@ -60,7 +58,7 @@ public class UserDbStorage implements UserStorage {
                 , user.getName()
                 , user.getBirthday()
                 , user.getId());
-        return findById(user.getId());
+        return user;
     }
 
     @Override
