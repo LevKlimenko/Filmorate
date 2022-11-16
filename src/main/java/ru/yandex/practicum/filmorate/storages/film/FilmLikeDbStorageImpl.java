@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.storages.film;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.Genre;
 import ru.yandex.practicum.filmorate.models.Mpa;
 
 import java.sql.ResultSet;
@@ -39,8 +41,9 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
-        String sqlQuery = "SELECT ID, NAME, RELEASE_DATE, DESCRIPTION, DURATION, RATE, MPA, GENRES " +
-                "From FILMS f LEFT OUTER JOIN LIKES on F.ID = LIKES.FILM_ID " +
+        String sqlQuery = "SELECT f.ID, f.NAME, RELEASEDATE, DESCRIPTION, DURATION, RATE, MPA, GENRES " +
+                "From FILMS f LEFT JOIN LIKES on F.ID = LIKES.FILM_ID " +
+                "INNER JOIN MPA ON mpa.id=films.mpa " +
                 "GROUP BY f.ID " +
                 "ORDER BY count(DISTINCT LIKES.USER_ID) DESC LIMIT ? ";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
@@ -71,11 +74,25 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
                 .duration(resultSet.getInt("duration"))
                 .rate(resultSet.getInt("rate"))
                 .mpa(Mpa.builder()
-                        .id(resultSet.getLong("mpa.id"))
-                        .name(resultSet.getString("mpa.name"))
+                        .id(resultSet.getLong("MPA.ID"))
+                        .name(resultSet.getString("MPA.NAME"))
                         .build())
-                .genres(filmGenres.get(resultSet.getLong(("id"))))
+                .genres(putGenresOfFilm(resultSet.getLong(("id"))))
                 .build();
+    }
+
+    private List<Genre> putGenresOfFilm(Long filmId) {
+        List<Genre> genres;
+        try {
+            String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
+            genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> Genre.builder()
+                    .id(rs.getLong("id"))
+                    .name(rs.getString("name"))
+                    .build(), filmId);
+            return genres;
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
+        }
     }
 
 

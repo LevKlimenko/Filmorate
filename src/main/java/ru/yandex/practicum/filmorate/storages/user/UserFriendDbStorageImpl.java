@@ -21,6 +21,8 @@ public class UserFriendDbStorageImpl implements UserFriendDbStorage {
         if (userId1.equals(userId2)) {
             throw new ConflictException("Сan't add yourself as a friend");
         }
+        isExistUser(userId1);
+        isExistUser(userId2);
         String sqlQuery = "MERGE INTO FRIENDSHIP key(USER_ID, FRIEND_ID) values(?,?)";
         int row = jdbcTemplate.update(sqlQuery, userId1, userId2);
         if (row == 0) {
@@ -51,8 +53,8 @@ public class UserFriendDbStorageImpl implements UserFriendDbStorage {
     public List<User> showIntersectionFriends(Long userId1, Long userId2) {
         isExistUser(userId1);
         isExistUser(userId2);
-        String sqlQuery = "select * from USERS u, FRIENDS f, FRIENDS o " +
-                "where u.USER_ID = f.FRIEND_ID AND u.USER_ID = o.FRIEND_ID AND f.USER_ID = ? AND o.USER_ID = ?";
+        String sqlQuery = "select * from USERS u, FRIENDSHIP f, FRIENDSHIP o " +
+                "where u.ID = f.FRIEND_ID AND u.ID = o.FRIEND_ID AND f.USER_ID = ? AND o.USER_ID = ?";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser, userId1, userId2);
     }
 

@@ -108,7 +108,7 @@ class UserControllerTest {
                 .login("testLogin")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        userController.createUser(user);
+        userController.create(user);
         assertEquals(user.getLogin(), user.getName(), "Имя не совпадает с логином");
     }
 
@@ -257,7 +257,7 @@ class UserControllerTest {
                 .login("testLoginUpdate")
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
-        userController.updateUser(user2);
+        userController.update(user2);
         assertEquals(user2.getLogin(), user2.getName(), "Имя и Логин не совпадают");
     }
 

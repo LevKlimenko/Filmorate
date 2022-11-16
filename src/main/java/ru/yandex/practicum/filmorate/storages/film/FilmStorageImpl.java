@@ -24,7 +24,7 @@ import java.util.*;
 public class FilmStorageImpl implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    Map<Long, List<Genre>> filmGenres = new HashMap<>();
+    //Map<Long, List<Genre>> filmGenres = new HashMap<>();
 
 
     @Override
@@ -121,11 +121,11 @@ public class FilmStorageImpl implements FilmStorage {
                         .id(resultSet.getLong("mpa.id"))
                         .name(resultSet.getString("mpa.name"))
                         .build())
-                .genres(filmGenres.get(resultSet.getLong(("id"))))
+                .genres(putGenresOfFilm(resultSet.getLong(("id"))))
                 .build();
     }
 
-    private void putGenresOfFilm(Long filmId) {
+    private List<Genre> putGenresOfFilm(Long filmId) {
         List<Genre> genres;
         try {
             String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
@@ -133,7 +133,7 @@ public class FilmStorageImpl implements FilmStorage {
                     .id(rs.getLong("id"))
                     .name(rs.getString("name"))
                     .build(), filmId);
-            filmGenres.put(filmId, genres);
+            return genres;
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
         }
