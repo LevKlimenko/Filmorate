@@ -82,13 +82,6 @@ public class UserStorageImpl implements UserStorage {
         return true;
     }
 
-    public List<User> getUsers(List<Long> userId) {
-        String inSql = String.join(",", Collections.nCopies(userId.size(), "?"));
-        return jdbcTemplate.query(String.format("SELECT * FROM users WHERE id in (%s)", inSql),
-                this::mapRowToUser,
-                userId.toArray());
-    }
-
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("id"))
