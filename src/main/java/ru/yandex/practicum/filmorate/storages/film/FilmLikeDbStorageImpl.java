@@ -5,14 +5,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
+import ru.yandex.practicum.filmorate.models.Mpa;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
 public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmStorage filmStorage;
 
     @Override
     public boolean addLike(Long filmId, Long userId) {
@@ -37,12 +39,11 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
-        String sqlQuery = "SELECT f.ID, count(DISTINCT LIKES.USER_ID) as cnt " +
+        String sqlQuery = "SELECT ID, NAME, RELEASE_DATE, DESCRIPTION, DURATION, RATE, MPA, GENRES " +
                 "From FILMS f LEFT OUTER JOIN LIKES on F.ID = LIKES.FILM_ID " +
                 "GROUP BY f.ID " +
-                "ORDER BY cnt DESC LIMIT ? ";
-        List<Long> filmsRows = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("ID"), count);
-        return filmStorage.getFilms(filmsRows);
+                "ORDER BY count(DISTINCT LIKES.USER_ID) DESC LIMIT ? ";
+        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
     }
 
     private void isExistFilm(Long id) {
@@ -60,4 +61,22 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
             throw new NotFoundException("User with ID=" + id + " not found");
         }
     }
+
+    private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
+        return Film.builder()
+                .id(resultSet.getLong("id"))
+                .name((resultSet.getString("name")))
+                .releaseDate((resultSet.getDate("releaseDate")).toLocalDate())
+                .description(resultSet.getString("description"))
+                .duration(resultSet.getInt("duration"))
+                .rate(resultSet.getInt("rate"))
+                .mpa(Mpa.builder()
+                        .id(resultSet.getLong("mpa.id"))
+                        .name(resultSet.getString("mpa.name"))
+                        .build())
+                .genres(filmGenres.get(resultSet.getLong(("id"))))
+                .build();
+    }
+
+
 }

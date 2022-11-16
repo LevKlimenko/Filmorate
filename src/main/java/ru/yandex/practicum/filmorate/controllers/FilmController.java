@@ -20,27 +20,27 @@ public class FilmController {
     private final CrudService<Film> filmService;
 
     @GetMapping
-    public List<Film> getAllFilms() {
+    public List<Film> getAll() {
         return filmService.getAll();
     }
 
     @PostMapping
-    public Film addFilm(@Valid @RequestBody Film film) {
+    public Film add(@Valid @RequestBody Film film) {
         return filmService.create(film);
     }
 
     @PutMapping
-    public Film updateFilm(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         return filmService.update(film);
     }
 
     @GetMapping("/{filmId}")
-    public Film findFilm(@PathVariable("filmId") Long filmId) {
+    public Film getById(@PathVariable("filmId") Long filmId) {
         return filmService.findById(filmId);
     }
 
     @PutMapping("/{filmId}/like/{userId}")
-    public Film addLikeFilmByUser(@PathVariable("filmId") Long filmId,
+    public Film addLikeByUser(@PathVariable("filmId") Long filmId,
                                   @PathVariable("userId") Long userId) {
         filmLikeDbService.addLike(filmId, userId);
         return filmService.findById(filmId);
@@ -53,7 +53,7 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilm(@RequestParam(value = "count", defaultValue = "10", required = false) @Positive Integer count) {
+    public List<Film> getMostPopular(@RequestParam(value = "count", defaultValue = "10", required = false) @Positive Integer count) {
         return filmLikeDbService.showMostLikedFilms(count);
 
     }

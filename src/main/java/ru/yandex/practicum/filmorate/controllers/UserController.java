@@ -21,24 +21,24 @@ public class UserController {
     private final CrudService<User> userService;
 
     @GetMapping
-    public List<User> getAllUser() {
+    public List<User> getAll() {
         return userService.getAll();
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
+    public User create(@Valid @RequestBody User user) {
         checkBlankAndNullName(user);
         return userService.create(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User update(@Valid @RequestBody User user) {
         checkBlankAndNullName(user);
         return userService.update(user);
     }
 
     @GetMapping("/{userId}")
-    public User findUser(@PathVariable("userId") Long userId) {
+    public User getById(@PathVariable("userId") Long userId) {
         return userService.findById(userId);
     }
 
@@ -57,7 +57,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> showUserFriends(@PathVariable("id") Long userId) {
+    public List<User> showFriends(@PathVariable("id") Long userId) {
         return userFriendDbService.showAllUserFriends(userId);
     }
 
@@ -68,7 +68,7 @@ public class UserController {
     }
 
     private void checkBlankAndNullName(User user) {
-        if (user.getName() == null || user.getName().isEmpty()) {
+        if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
         }
     }

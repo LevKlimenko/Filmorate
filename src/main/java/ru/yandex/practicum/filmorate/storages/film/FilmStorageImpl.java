@@ -26,6 +26,7 @@ public class FilmStorageImpl implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     Map<Long, List<Genre>> filmGenres = new HashMap<>();
 
+
     @Override
     public List<Film> getAll() {
         String sqlQuery = "SELECT * from films Inner JOIN MPA ON mpa.id=films.mpa";
@@ -98,15 +99,6 @@ public class FilmStorageImpl implements FilmStorage {
             throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
         }
         return film;
-    }
-
-    @Override
-    public List<Film> getFilms(List<Long> filmsId) {
-        List<Film> films = new ArrayList<>();
-        for (Long id : filmsId) {
-            films.add(findById(id));
-        }
-        return films;
     }
 
     @Override
