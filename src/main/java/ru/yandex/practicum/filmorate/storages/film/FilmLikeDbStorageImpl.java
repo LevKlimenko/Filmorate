@@ -41,12 +41,11 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
-        String sqlQuery = "SELECT f.ID, f.NAME, RELEASEDATE, DESCRIPTION, DURATION, RATE, MPA, GENRES " +
-                "From FILMS f LEFT JOIN LIKES on F.ID = LIKES.FILM_ID " +
-                "INNER JOIN MPA ON mpa.id=films.mpa " +
-                "GROUP BY f.ID " +
-                "ORDER BY count(DISTINCT LIKES.USER_ID) DESC LIMIT ? ";
-        return jdbcTemplate.query(sqlQuery, this::mapRowToFilm, count);
+        String sql="select * from FILMS as F inner join MPA on MPA.ID = F.MPA " +
+                "LEFT OUTER JOIN LIKES L on L.FILM_ID = F.ID " +
+                "GROUP BY F.ID " +
+                "ORDER BY count(DISTINCT L.USER_ID) desc LIMIT ?";
+        return jdbcTemplate.query(sql, this::mapRowToFilm,count);
     }
 
     private void isExistFilm(Long id) {
@@ -94,6 +93,4 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
             throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
         }
     }
-
-
 }

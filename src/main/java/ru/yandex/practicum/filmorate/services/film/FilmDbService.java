@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.services.CrudService;
 import ru.yandex.practicum.filmorate.storages.film.FilmLikeDbStorage;
 import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storages.genre.GenreStorage;
 
 import java.util.List;
 
@@ -14,15 +15,19 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
 
     private final FilmStorage filmStorage;
     private final FilmLikeDbStorage filmLikeDbStorage;
+    private final GenreStorage genreStorage;
 
     @Autowired
-    public FilmDbService(FilmStorage filmStorage, FilmLikeDbStorage filmLikeDbStorage) {
+    public FilmDbService(FilmStorage filmStorage, FilmLikeDbStorage filmLikeDbStorage, GenreStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.filmLikeDbStorage = filmLikeDbStorage;
+        this.genreStorage = genreStorage;
     }
 
     @Override
     public List<Film> getAll() {
+        final List<Film> films = filmStorage.getAll();
+        genreStorage.load(films);
         return filmStorage.getAll();
     }
 
@@ -38,6 +43,8 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
 
     @Override
     public Film findById(Long id) {
+        final List<Film> films = filmStorage.getAll();
+        genreStorage.load(films);
         return filmStorage.findById(id);
     }
 
@@ -53,6 +60,8 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
+        final List<Film> films = filmStorage.getAll();
+        genreStorage.load(films);
         return filmLikeDbStorage.showMostLikedFilms(count);
     }
 }

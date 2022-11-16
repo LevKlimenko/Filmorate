@@ -17,15 +17,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Repository
 public class FilmStorageImpl implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    //Map<Long, List<Genre>> filmGenres = new HashMap<>();
-
 
     @Override
     public List<Film> getAll() {
@@ -56,7 +56,7 @@ public class FilmStorageImpl implements FilmStorage {
             film.setGenres(removeDuplicateGenre(film.getGenres()));
             mergeFilmGenres(film);
         }
-        putGenresOfFilm(film.getId());
+        film.setGenres(putGenresOfFilm(film.getId()));
         return film;
     }
 
@@ -82,7 +82,7 @@ public class FilmStorageImpl implements FilmStorage {
                 deleteFilmGenres(film);
                 mergeFilmGenres(film);
             }
-            putGenresOfFilm(film.getId());
+            film.setGenres(putGenresOfFilm(film.getId()));
             return film;
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(String.format("Film with id=%d not found.", film.getId()));
@@ -121,7 +121,7 @@ public class FilmStorageImpl implements FilmStorage {
                         .id(resultSet.getLong("mpa.id"))
                         .name(resultSet.getString("mpa.name"))
                         .build())
-                .genres(putGenresOfFilm(resultSet.getLong(("id"))))
+                .genres(putGenresOfFilm(resultSet.getLong("id")))
                 .build();
     }
 

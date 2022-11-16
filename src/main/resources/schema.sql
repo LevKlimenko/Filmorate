@@ -18,8 +18,7 @@ CREATE TABLE IF NOT EXISTS films
     duration    INTEGER NOT NULL,
     rate        INTEGER NOT NULL,
     mpa         INTEGER NOT NULL,
-    genres      INTEGER,
-    likes       INTEGER,
+
     CONSTRAINT duration_positive
         CHECK (duration >= 0),
     CONSTRAINT space_name

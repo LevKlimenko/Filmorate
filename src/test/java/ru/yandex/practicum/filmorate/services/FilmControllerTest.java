@@ -20,6 +20,7 @@ import ru.yandex.practicum.filmorate.storages.film.FilmLikeDbStorage;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -210,7 +211,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
 
                 .build();
         filmService.create(film);
@@ -232,7 +233,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
                 .build();
         filmService.create(film);
         user = User.builder()
@@ -257,7 +258,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
                 .build();
         filmService.create(film);
         assertEquals(1, filmLikeDbStorage.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
@@ -269,7 +270,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
                 .build();
         filmService.create(film2);
         assertEquals(2, filmLikeDbStorage.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
@@ -297,7 +298,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
                 .build();
         filmService.create(film);
         Film film2 = Film.builder()
@@ -307,7 +308,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
                 .build();
         filmService.create(film2);
         user = User.builder()
@@ -336,7 +337,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
                 .build();
         filmService.create(film);
         Film film2 = Film.builder()
@@ -346,7 +347,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Arrays.asList(genreService.findById(1L)))
+                .genres(Collections.singletonList(genreService.findById(1L)))
 
                 .build();
         filmService.create(film2);

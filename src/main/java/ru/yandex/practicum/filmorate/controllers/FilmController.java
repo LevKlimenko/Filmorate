@@ -41,7 +41,7 @@ public class FilmController {
 
     @PutMapping("/{filmId}/like/{userId}")
     public Film addLikeByUser(@PathVariable("filmId") Long filmId,
-                                  @PathVariable("userId") Long userId) {
+                              @PathVariable("userId") Long userId) {
         filmLikeDbService.addLike(filmId, userId);
         return filmService.findById(filmId);
     }
@@ -53,8 +53,8 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopular(@RequestParam(value = "count", defaultValue = "10", required = false) @Positive Integer count) {
+    public List<Film> getMostPopular(@RequestParam(value = "count", defaultValue = "10", required = false)
+                                         @Positive Integer count) {
         return filmLikeDbService.showMostLikedFilms(count);
-
     }
 }
