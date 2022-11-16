@@ -21,13 +21,13 @@ import java.util.*;
 
 @RequiredArgsConstructor
 @Repository
-public class FilmDbStorage implements FilmStorage {
+public class FilmStorageImpl implements FilmStorage {
 
     private final JdbcTemplate jdbcTemplate;
     Map<Long, List<Genre>> filmGenres = new HashMap<>();
 
     @Override
-    public Collection<Film> getAll() {
+    public List<Film> getAll() {
         String sqlQuery = "SELECT * from films Inner JOIN MPA ON mpa.id=films.mpa";
         return jdbcTemplate.query(sqlQuery, this::mapRowToFilm);
     }
@@ -117,11 +117,6 @@ public class FilmDbStorage implements FilmStorage {
         return true;
     }
 
-    private List<Long> findUsersIdWhoLikedFilm(Long id) {
-        String sqlQuery = "SELECT user_id FROM likes WHERE film_id = ?";
-        return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
-    }
-
     private Film mapRowToFilm(ResultSet resultSet, int rowNum) throws SQLException {
         return Film.builder()
                 .id(resultSet.getLong("id"))
@@ -135,7 +130,6 @@ public class FilmDbStorage implements FilmStorage {
                         .name(resultSet.getString("mpa.name"))
                         .build())
                 .genres(filmGenres.get(resultSet.getLong(("id"))))
-                .likesId(findUsersIdWhoLikedFilm(resultSet.getLong("id")))
                 .build();
     }
 

@@ -1,27 +1,13 @@
 package ru.yandex.practicum.filmorate.services.mpa;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.models.Mpa;
 
 import java.util.Collection;
+import java.util.List;
 
-@Service
-public class MpaService implements MpaServiceInterface {
-    private final ru.yandex.practicum.filmorate.storages.mpa.MpaStorageInterface mpaStorage;
+public interface MpaService {
 
-    @Autowired
-    public MpaService(ru.yandex.practicum.filmorate.storages.mpa.MpaStorageInterface mpaStorage) {
-        this.mpaStorage = mpaStorage;
-    }
+    List<Mpa> getAll();
 
-    @Override
-    public Collection<Mpa> getAll() {
-        return mpaStorage.findAllMpa();
-    }
-
-    @Override
-    public Mpa findById(Long id) {
-        return mpaStorage.findMpaById(id);
-    }
+    Mpa findById(Long id);
 }

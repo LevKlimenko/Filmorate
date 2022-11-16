@@ -13,11 +13,11 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class MpaDbStorage implements MpaStorageInterface {
+public class MpaStorageImpl implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Mpa findMpaById(Long id) {
+    public Mpa findById(Long id) {
         String sqlQuery = " select * from MPA where id = ?";
         Mpa mpa;
         try {
@@ -29,7 +29,7 @@ public class MpaDbStorage implements MpaStorageInterface {
     }
 
     @Override
-    public List<Mpa> findAllMpa() {
+    public List<Mpa> getAll() {
         String sqlQuery = "SELECT * from mpa";
         return jdbcTemplate.query(sqlQuery, this::mapRowToMpa);
     }

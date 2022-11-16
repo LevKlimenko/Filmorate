@@ -4,9 +4,9 @@ import ru.yandex.practicum.filmorate.models.Film;
 
 import java.util.List;
 
-public interface FilmLikeService {
+public interface FilmLikeDbService {
 
-    void addLike(Long filmId, Long userId);
+    boolean addLike(Long filmId, Long userId);
 
     boolean deleteLike(Long filmId, Long userId);
 

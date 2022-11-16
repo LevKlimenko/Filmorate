@@ -12,8 +12,8 @@ import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.models.Genre;
-import ru.yandex.practicum.filmorate.services.genre.GenreService;
-import ru.yandex.practicum.filmorate.services.mpa.MpaService;
+import ru.yandex.practicum.filmorate.services.genre.GenreServiceImp;
+import ru.yandex.practicum.filmorate.services.mpa.MpaServiceImpl;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class GenreControllerTest {
     private final JdbcTemplate jdbcTemplate;
     private final CrudService<Film> filmService;
-    private final MpaService mpaService;
-    private final GenreService genreService;
+    private final MpaServiceImpl mpaService;
+    private final GenreServiceImp genreService;
     Film film;
 
     @BeforeEach

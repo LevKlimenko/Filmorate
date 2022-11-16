@@ -14,7 +14,7 @@ import ru.yandex.practicum.filmorate.exceptions.BadRequestException;
 import ru.yandex.practicum.filmorate.exceptions.ConflictException;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
-import ru.yandex.practicum.filmorate.services.user.UserFriendService;
+import ru.yandex.practicum.filmorate.storages.user.UserFriendDbStorage;
 
 import java.time.LocalDate;
 
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class UserControllerTest {
 
     private final JdbcTemplate jdbcTemplate;
-    private final UserFriendService userFriendService;
+    private final UserFriendDbStorage userFriendDbStorage;
     private final CrudService<User> userService;
     private final UserController userController;
     User user;
@@ -281,8 +281,8 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user2);
-        assertEquals(0, userFriendService.showAllUserFriends(1L).size(), "Количество друзей пользователя 1 неверное");
-        assertEquals(0, userFriendService.showAllUserFriends(2L).size(), "Количество друзей пользователя 2 неверное");
+        assertEquals(0, userFriendDbStorage.showAllUserFriends(1L).size(), "Количество друзей пользователя 1 неверное");
+        assertEquals(0, userFriendDbStorage.showAllUserFriends(2L).size(), "Количество друзей пользователя 2 неверное");
     }
 
     @Test
@@ -301,10 +301,10 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user2);
-        userFriendService.becomeFriend(user.getId(), user2.getId());
-        assertEquals(1, userFriendService.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 отличается");
-        assertEquals(userService.findById(user2.getId()), userFriendService.showAllUserFriends(1L).get(0), "Друг пользователя 1 отличается");
-        assertEquals(0, userFriendService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 отличается");
+        userFriendDbStorage.becomeFriend(user.getId(), user2.getId());
+        assertEquals(1, userFriendDbStorage.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 отличается");
+        assertEquals(userService.findById(user2.getId()), userFriendDbStorage.showAllUserFriends(1L).get(0), "Друг пользователя 1 отличается");
+        assertEquals(0, userFriendDbStorage.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 отличается");
     }
 
     @Test
@@ -316,7 +316,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user);
-        assertThrows(ConflictException.class, () -> userFriendService.becomeFriend(user.getId(), user.getId()), "Пользователь стал сам себе другом");
+        assertThrows(ConflictException.class, () -> userFriendDbStorage.becomeFriend(user.getId(), user.getId()), "Пользователь стал сам себе другом");
     }
 
     @Test
@@ -335,8 +335,8 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user2);
-        userFriendService.becomeFriend(user.getId(), user2.getId());
-        assertThrows(ConflictException.class, () -> userFriendService.becomeFriend(user.getId(), user2.getId()), "Пользователь опять добавил друга в друзья");
+        userFriendDbStorage.becomeFriend(user.getId(), user2.getId());
+        assertEquals(1, userFriendDbStorage.showAllUserFriends(user.getId()).size(), "Пользователь опять добавил друга в друзья");
     }
 
     @Test
@@ -348,7 +348,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user);
-        assertThrows(NotFoundException.class, () -> userFriendService.stopBeingFriends(user.getId(), -5L), "Дружба прекращена");
+        assertThrows(NotFoundException.class, () -> userFriendDbStorage.stopBeingFriends(user.getId(), -5L), "Дружба прекращена");
     }
 
     @Test
@@ -360,7 +360,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user);
-        assertThrows(NotFoundException.class, () -> userFriendService.becomeFriend(user.getId(), -5L), "Пользователи стали друзьями");
+        assertThrows(NotFoundException.class, () -> userFriendDbStorage.becomeFriend(user.getId(), -5L), "Пользователи стали друзьями");
     }
 
     @Test
@@ -379,12 +379,12 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user2);
-        userFriendService.becomeFriend(user.getId(), user2.getId());
-        userFriendService.becomeFriend(user2.getId(), user.getId());
-        assertEquals(1, userFriendService.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 отличается");
-        assertEquals(userService.findById(user2.getId()), userFriendService.showAllUserFriends(1L).get(0), "Друг пользователя 1 отличается");
-        assertEquals(1, userFriendService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 отличается");
-        assertEquals(userService.findById(user.getId()), userFriendService.showAllUserFriends(2L).get(0), "Друг пользователя 2 отличается");
+        userFriendDbStorage.becomeFriend(user.getId(), user2.getId());
+        userFriendDbStorage.becomeFriend(user2.getId(), user.getId());
+        assertEquals(1, userFriendDbStorage.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 отличается");
+        assertEquals(userService.findById(user2.getId()), userFriendDbStorage.showAllUserFriends(1L).get(0), "Друг пользователя 1 отличается");
+        assertEquals(1, userFriendDbStorage.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 отличается");
+        assertEquals(userService.findById(user.getId()), userFriendDbStorage.showAllUserFriends(2L).get(0), "Друг пользователя 2 отличается");
     }
 
     @Test
@@ -410,12 +410,12 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user3);
-        userFriendService.becomeFriend(user.getId(), user2.getId());
-        userFriendService.becomeFriend(user.getId(), user3.getId());
-        assertEquals(2, userFriendService.showAllUserFriends(1L).size());
-        assertEquals(userService.findById(user2.getId()), userFriendService.showAllUserFriends(1L).get(0), "Дружба 1-2 различается");
-        assertEquals(userService.findById(user3.getId()), userFriendService.showAllUserFriends(1L).get(1), "Дружба 1-3 различается");
-        assertEquals(0, userFriendService.showAllUserFriends(3L).size(), "Количество друзей у пользователя 3 не совпалает");
+        userFriendDbStorage.becomeFriend(user.getId(), user2.getId());
+        userFriendDbStorage.becomeFriend(user.getId(), user3.getId());
+        assertEquals(2, userFriendDbStorage.showAllUserFriends(1L).size());
+        assertEquals(userService.findById(user2.getId()), userFriendDbStorage.showAllUserFriends(1L).get(0), "Дружба 1-2 различается");
+        assertEquals(userService.findById(user3.getId()), userFriendDbStorage.showAllUserFriends(1L).get(1), "Дружба 1-3 различается");
+        assertEquals(0, userFriendDbStorage.showAllUserFriends(3L).size(), "Количество друзей у пользователя 3 не совпалает");
     }
 
     @Test
@@ -441,22 +441,22 @@ class UserControllerTest {
                 .birthday(LocalDate.of(2000, 10, 10))
                 .build();
         userService.create(user3);
-        userFriendService.becomeFriend(user.getId(), user2.getId());
-        userFriendService.becomeFriend(user.getId(), user3.getId());
-        userFriendService.becomeFriend(user2.getId(), user3.getId());
-        assertEquals(2, userFriendService.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 не совпадает");
-        assertEquals(1, userFriendService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 не совпадает");
-        assertEquals(userService.findById(user2.getId()), userFriendService.showAllUserFriends(1L).get(0), "Дружба 1-2 не совпадает");
-        assertEquals(userService.findById(user3.getId()), userFriendService.showAllUserFriends(1L).get(1), "Дружба 1-3 не совпадает");
-        assertEquals(userService.findById(user3.getId()), userFriendService.showAllUserFriends(2L).get(0), "Дружба 2-3 не совпадает");
-        assertEquals(1, userFriendService.showIntersectionFriends(user.getId(), user2.getId()).size(),
+        userFriendDbStorage.becomeFriend(user.getId(), user2.getId());
+        userFriendDbStorage.becomeFriend(user.getId(), user3.getId());
+        userFriendDbStorage.becomeFriend(user2.getId(), user3.getId());
+        assertEquals(2, userFriendDbStorage.showAllUserFriends(1L).size(), "Количество друзей у пользователя 1 не совпадает");
+        assertEquals(1, userFriendDbStorage.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 не совпадает");
+        assertEquals(userService.findById(user2.getId()), userFriendDbStorage.showAllUserFriends(1L).get(0), "Дружба 1-2 не совпадает");
+        assertEquals(userService.findById(user3.getId()), userFriendDbStorage.showAllUserFriends(1L).get(1), "Дружба 1-3 не совпадает");
+        assertEquals(userService.findById(user3.getId()), userFriendDbStorage.showAllUserFriends(2L).get(0), "Дружба 2-3 не совпадает");
+        assertEquals(1, userFriendDbStorage.showIntersectionFriends(user.getId(), user2.getId()).size(),
                 "Количество общих друзей различается");
         assertEquals(userService.findById(user3.getId()),
-                userFriendService.showIntersectionFriends(user.getId(), user2.getId()).get(0), "Общие друзья у пользователей 1 и 2 не совпадают");
-        assertEquals(0, userFriendService.showAllUserFriends(3L).size(), "Количество друзей у пользователя 3 не совпадает");
-        userFriendService.stopBeingFriends(user2.getId(), user3.getId());
-        assertEquals(0, userFriendService.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 не совпадает");
-        assertEquals(0, userFriendService.showIntersectionFriends(user.getId(), user2.getId()).size(),
+                userFriendDbStorage.showIntersectionFriends(user.getId(), user2.getId()).get(0), "Общие друзья у пользователей 1 и 2 не совпадают");
+        assertEquals(0, userFriendDbStorage.showAllUserFriends(3L).size(), "Количество друзей у пользователя 3 не совпадает");
+        userFriendDbStorage.stopBeingFriends(user2.getId(), user3.getId());
+        assertEquals(0, userFriendDbStorage.showAllUserFriends(2L).size(), "Количество друзей у пользователя 2 не совпадает");
+        assertEquals(0, userFriendDbStorage.showIntersectionFriends(user.getId(), user2.getId()).size(),
                 "Количество общих друзей различается");
     }
 }

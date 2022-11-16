@@ -5,10 +5,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.models.Film;
 import ru.yandex.practicum.filmorate.services.CrudService;
-import ru.yandex.practicum.filmorate.services.film.FilmLikeService;
+import ru.yandex.practicum.filmorate.services.film.FilmLikeDbService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Validated
@@ -16,11 +16,11 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/films")
 public class FilmController {
-    private final FilmLikeService filmLikeService;
+    private final FilmLikeDbService filmLikeDbService;
     private final CrudService<Film> filmService;
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
+    public List<Film> getAllFilms() {
         return filmService.getAll();
     }
 
@@ -42,26 +42,19 @@ public class FilmController {
     @PutMapping("/{filmId}/like/{userId}")
     public Film addLikeFilmByUser(@PathVariable("filmId") Long filmId,
                                   @PathVariable("userId") Long userId) {
-        filmLikeService.addLike(filmId, userId);
+        filmLikeDbService.addLike(filmId, userId);
         return filmService.findById(filmId);
     }
 
     @DeleteMapping("/{filmId}/like/{userId}")
     public Boolean deleteLikeByUser(@PathVariable("filmId") Long filmId,
                                     @PathVariable("userId") Long userId) {
-        return filmLikeService.deleteLike(filmId, userId);
+        return filmLikeDbService.deleteLike(filmId, userId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getMostPopularFilm(@RequestParam(value = "count", defaultValue = "10", required = false) Integer count) {
-        try {
-            if (count < 0) {
-                count = 10;
-            }
-            return filmLikeService.showMostLikedFilms(count);
-        } catch (NumberFormatException e) {
-            e.getMessage();
-        }
-        return filmLikeService.showMostLikedFilms(10);
+    public List<Film> getMostPopularFilm(@RequestParam(value = "count", defaultValue = "10", required = false) @Positive Integer count) {
+        return filmLikeDbService.showMostLikedFilms(count);
+
     }
 }

@@ -13,11 +13,11 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
-public class GenreDbStorage implements GenreStorageInterface {
+public class GenreStorageImpl implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Genre findGenreById(Long id) {
+    public Genre findById(Long id) {
         String sqlQuery = " select * from genres where id = ?";
         Genre genre;
         try {
@@ -29,7 +29,7 @@ public class GenreDbStorage implements GenreStorageInterface {
     }
 
     @Override
-    public List<Genre> findAllGenre() {
+    public List<Genre> getAll() {
         String sqlQuery = "SELECT * from genres";
         return jdbcTemplate.query(sqlQuery, this::mapRowToGenre);
     }

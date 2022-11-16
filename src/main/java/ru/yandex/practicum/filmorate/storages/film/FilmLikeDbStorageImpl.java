@@ -1,40 +1,33 @@
-package ru.yandex.practicum.filmorate.services.film;
+package ru.yandex.practicum.filmorate.storages.film;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.storages.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 
 import java.util.List;
 
-@Service
-public class FilmLikeModule implements FilmLikeService {
+@Repository
+@RequiredArgsConstructor
+public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmStorage filmStorage;
-    private final UserStorage userStorage;
-
-    @Autowired
-    public FilmLikeModule(JdbcTemplate jdbcTemplate, FilmStorage filmStorage, UserStorage userStorage) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
 
     @Override
-    public void addLike(Long filmId, Long userId) {
-        filmStorage.isExist(filmId);
-        userStorage.isExist(userId);
+    public boolean addLike(Long filmId, Long userId) {
+        isExistFilm(filmId);
+        isExistUser(userId);
         String sqlQuery = "MERGE INTO LIKES key(FILM_ID,USER_ID) values (?, ?)";
         jdbcTemplate.update(sqlQuery, filmId, userId);
+        return true;
     }
 
     @Override
     public boolean deleteLike(Long filmId, Long userId) {
-        filmStorage.isExist(filmId);
-        userStorage.isExist(userId);
+        isExistFilm(filmId);
+        isExistUser(userId);
         String sqlQuery = "DELETE from LIKES WHERE FILM_ID=? AND USER_ID=?";
         int row = jdbcTemplate.update(sqlQuery, filmId, userId);
         if (row == 0) {
@@ -51,5 +44,21 @@ public class FilmLikeModule implements FilmLikeService {
                 "ORDER BY cnt DESC LIMIT ? ";
         List<Long> filmsRows = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> rs.getLong("ID"), count);
         return filmStorage.getFilms(filmsRows);
+    }
+
+    private void isExistFilm(Long id) {
+        Integer cnt = jdbcTemplate.queryForObject(
+                "SELECT count(*) From FILMS where id = ?", Integer.class, id);
+        if (cnt == null || cnt <= 0) {
+            throw new NotFoundException("Film with ID=" + id + " not found");
+        }
+    }
+
+    private void isExistUser(Long id) {
+        Integer cnt = jdbcTemplate.queryForObject(
+                "SELECT count(*) From USERS where id = ?", Integer.class, id);
+        if (cnt == null || cnt <= 0) {
+            throw new NotFoundException("User with ID=" + id + " not found");
+        }
     }
 }

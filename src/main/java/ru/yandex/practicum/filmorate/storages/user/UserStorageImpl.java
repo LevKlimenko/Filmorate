@@ -11,18 +11,17 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.sql.*;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
-public class UserDbStorage implements UserStorage {
+public class UserStorageImpl implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
-    public Collection<User> getAll() {
+    public List<User> getAll() {
         String sqlQuery = "SELECT * from users";
         return jdbcTemplate.query(sqlQuery, this::mapRowToUser);
     }
@@ -49,16 +48,18 @@ public class UserDbStorage implements UserStorage {
         if (user.getId() == null) {
             throw new BadRequestException("Can't update user without ID");
         }
-        isExist(user.getId());
         String sqlQuery = "UPDATE users SET email = ?, login = ?, name = ?, birthday =?" +
                 "where id = ?";
-        jdbcTemplate.update(sqlQuery
+        if (jdbcTemplate.update(sqlQuery
                 , user.getEmail()
                 , user.getLogin()
                 , user.getName()
                 , user.getBirthday()
-                , user.getId());
-        return user;
+                , user.getId()) > 0) {
+            return user;
+        } else {
+            throw new NotFoundException("Can't update user with ID="+user.getId());
+        }
     }
 
     @Override
@@ -88,7 +89,6 @@ public class UserDbStorage implements UserStorage {
                 userId.toArray());
     }
 
-
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         return User.builder()
                 .id(resultSet.getLong("id"))
@@ -96,12 +96,6 @@ public class UserDbStorage implements UserStorage {
                 .login((resultSet.getString("login")))
                 .name(resultSet.getString("name"))
                 .birthday(resultSet.getDate("birthday").toLocalDate())
-                .friendsId(findUsersFriends(resultSet.getLong("id")))
                 .build();
-    }
-
-    private List<Long> findUsersFriends(Long id) {
-        String sqlQuery = "SELECT FRIEND_ID FROM friendship WHERE USER_ID = ?";
-        return jdbcTemplate.queryForList(sqlQuery, Long.class, id);
     }
 }
