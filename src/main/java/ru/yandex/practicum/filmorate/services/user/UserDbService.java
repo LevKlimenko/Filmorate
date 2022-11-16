@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.storages.user.UserStorage;
 import java.util.List;
 
 @Service
-public class UserDbService implements CrudService<User>,UserFriendDbService {
+public class UserDbService implements CrudService<User>, UserFriendDbService {
     private final UserStorage userStorage;
     private final UserFriendDbStorage userFriendDbStorage;
 
@@ -42,12 +42,12 @@ public class UserDbService implements CrudService<User>,UserFriendDbService {
 
     @Override
     public boolean becomeFriend(Long userId1, Long userId2) {
-        return userFriendDbStorage.becomeFriend(userId1,userId2);
+        return userFriendDbStorage.becomeFriend(userId1, userId2);
     }
 
     @Override
     public boolean stopBeingFriends(Long userId1, Long userId2) {
-        return userFriendDbStorage.stopBeingFriends(userId1,userId2);
+        return userFriendDbStorage.stopBeingFriends(userId1, userId2);
     }
 
     @Override
@@ -57,6 +57,6 @@ public class UserDbService implements CrudService<User>,UserFriendDbService {
 
     @Override
     public List<User> showIntersectionFriends(Long userId1, Long userId2) {
-        return userFriendDbStorage.showIntersectionFriends(userId1,userId2);
+        return userFriendDbStorage.showIntersectionFriends(userId1, userId2);
     }
 }

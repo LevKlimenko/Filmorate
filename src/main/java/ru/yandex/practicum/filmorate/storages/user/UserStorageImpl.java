@@ -11,7 +11,6 @@ import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.User;
 
 import java.sql.*;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -58,7 +57,7 @@ public class UserStorageImpl implements UserStorage {
                 , user.getId()) > 0) {
             return user;
         } else {
-            throw new NotFoundException("Can't update user with ID="+user.getId());
+            throw new NotFoundException("Can't update user with ID=" + user.getId());
         }
     }
 

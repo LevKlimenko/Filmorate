@@ -43,12 +43,12 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
 
     @Override
     public boolean addLike(Long filmId, Long userId) {
-        return filmLikeDbStorage.addLike(filmId,userId);
+        return filmLikeDbStorage.addLike(filmId, userId);
     }
 
     @Override
     public boolean deleteLike(Long filmId, Long userId) {
-        return filmLikeDbStorage.deleteLike(filmId,userId);
+        return filmLikeDbStorage.deleteLike(filmId, userId);
     }
 
     @Override
