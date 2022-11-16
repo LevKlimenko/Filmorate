@@ -58,10 +58,10 @@ public class ErrorHandler {
         return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
     }
 
-   /* @ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         log.error(e.getMessage());
         return new ErrorResponse("Произошла непредвиденная ошибка");
-    }*/
+    }
 }
