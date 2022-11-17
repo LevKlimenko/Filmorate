@@ -18,9 +18,7 @@ import ru.yandex.practicum.filmorate.services.genre.GenreServiceImp;
 import ru.yandex.practicum.filmorate.services.mpa.MpaServiceImpl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

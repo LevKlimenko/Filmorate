@@ -1,18 +1,14 @@
 package ru.yandex.practicum.filmorate.storages.film;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.NotFoundException;
 import ru.yandex.practicum.filmorate.models.Film;
-import ru.yandex.practicum.filmorate.models.Genre;
 import ru.yandex.practicum.filmorate.models.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 
@@ -44,11 +40,11 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
-        String sql="select * from FILMS as F inner join MPA on MPA.ID = F.MPA " +
+        String sql = "select * from FILMS as F inner join MPA on MPA.ID = F.MPA " +
                 "LEFT OUTER JOIN LIKES L on L.FILM_ID = F.ID " +
                 "GROUP BY F.ID " +
                 "ORDER BY count(DISTINCT L.USER_ID) desc LIMIT ?";
-        return jdbcTemplate.query(sql, this::mapRowToFilm,count);
+        return jdbcTemplate.query(sql, this::mapRowToFilm, count);
     }
 
     private void isExistFilm(Long id) {
