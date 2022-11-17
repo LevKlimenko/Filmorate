@@ -2,8 +2,6 @@ package ru.yandex.practicum.filmorate.models;
 
 import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.models.constants.FilmGenre;
-import ru.yandex.practicum.filmorate.models.constants.FilmMPARating;
 import ru.yandex.practicum.filmorate.validators.DateReleaseConstraint;
 
 import javax.validation.constraints.NotBlank;
@@ -11,8 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.LinkedHashSet;
 
 @Data
 @Builder
@@ -27,9 +24,9 @@ public class Film {
     private LocalDate releaseDate;
     @PositiveOrZero(message = "Продолжительность должна быть больше или равно 0")
     private int duration;
-    private final Set<Long> likesId = new HashSet<>();
     @NotNull
-    private final Set<FilmGenre> genre = new HashSet<>();
+    private int rate;
     @NotNull
-    private final FilmMPARating MPARating;
+    private Mpa mpa;
+    private LinkedHashSet<Genre> genres;
 }

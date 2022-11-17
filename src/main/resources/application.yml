@@ -1,17 +1,27 @@
 logging:
-    level:
-        org:
-            zalando:
-                logbook: TRACE
-        ru:
-            yandex:
-                practicum:
-                    contollers: debug
+  level:
+    org:
+      zalando:
+        logbook: TRACE
+    ru:
+      yandex:
+        practicum:
+          contollers: debug
 server:
-    error:
-        include-message: always
-    servlet:
-        encoding:
-            charset: UTF-8
-            charset.force-response: true
-            charset.force-request: true
+  error:
+    include-message: always
+  servlet:
+    encoding:
+      charset: UTF-8
+      charset.force-response: true
+      charset.force-request: true
+
+spring:
+  sql:
+    init:
+      mode: always
+  datasource:
+    url: jdbc:h2:./db/filmorate
+    driver-class-name: org.h2.Driver
+    username: Sa
+    password: password
