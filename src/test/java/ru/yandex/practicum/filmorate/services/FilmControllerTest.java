@@ -20,6 +20,8 @@ import ru.yandex.practicum.filmorate.services.mpa.MpaServiceImpl;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -193,7 +195,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(1L))
-                .genres(new ArrayList<>())
+                .genres(new LinkedHashSet<>())
                 .build();
         filmService.create(film);
         assertEquals(1, filmLikeDbService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
@@ -209,8 +211,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
-
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
@@ -231,7 +232,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film);
         user = User.builder()
@@ -256,7 +257,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film);
         assertEquals(1, filmLikeDbService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
@@ -268,7 +269,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film2);
         assertEquals(2, filmLikeDbService.showMostLikedFilms(10).size(), "Количество фильмов не совпадает");
@@ -296,7 +297,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film);
         Film film2 = Film.builder()
@@ -306,7 +307,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film2);
         user = User.builder()
@@ -335,7 +336,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
                 .build();
         filmService.create(film);
         Film film2 = Film.builder()
@@ -345,7 +346,7 @@ public class FilmControllerTest {
                 .duration(100)
                 .rate(4)
                 .mpa(mpaService.findById(3L))
-                .genres(Collections.singletonList(genreService.findById(1L)))
+                .genres(new LinkedHashSet<>(Collections.singletonList(genreService.findById(1L))))
 
                 .build();
         filmService.create(film2);

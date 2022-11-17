@@ -17,9 +17,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Repository
@@ -53,10 +51,8 @@ public class FilmStorageImpl implements FilmStorage {
         long id = Objects.requireNonNull((keyHolder.getKey()).longValue());
         film.setId(id);
         if (validateGenresNotNull(film)) {
-            film.setGenres(removeDuplicateGenre(film.getGenres()));
             mergeFilmGenres(film);
         }
-        film.setGenres(putGenresOfFilm(film.getId()));
         return film;
     }
 
@@ -78,11 +74,9 @@ public class FilmStorageImpl implements FilmStorage {
                     , film.getMpa().getId()
                     , film.getId());
             if (validateGenresNotNull(film)) {
-                film.setGenres(removeDuplicateGenre(film.getGenres()));
                 deleteFilmGenres(film);
                 mergeFilmGenres(film);
             }
-            film.setGenres(putGenresOfFilm(film.getId()));
             return film;
         } catch (EmptyResultDataAccessException e) {
             throw new NotFoundException(String.format("Film with id=%d not found.", film.getId()));
@@ -121,34 +115,21 @@ public class FilmStorageImpl implements FilmStorage {
                         .id(resultSet.getLong("mpa.id"))
                         .name(resultSet.getString("mpa.name"))
                         .build())
-                .genres(putGenresOfFilm(resultSet.getLong("id")))
+                .genres(new LinkedHashSet<>())
                 .build();
     }
 
-    private List<Genre> putGenresOfFilm(Long filmId) {
-        List<Genre> genres;
-        try {
-            String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
-            genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> Genre.builder()
-                    .id(rs.getLong("id"))
-                    .name(rs.getString("name"))
-                    .build(), filmId);
-            return genres;
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
-        }
-    }
-
-    private boolean validateGenresNotNull(Film film) {
+      private boolean validateGenresNotNull(Film film) {
         return film.getGenres() != null;
     }
 
     private void mergeFilmGenres(Film film) {
+        final List<Genre> genreList = new ArrayList<>(film.getGenres());
         jdbcTemplate.batchUpdate("MERGE INTO film_genre key(film_id, genre_id) values (?, ?)", new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 ps.setLong(1, film.getId());
-                ps.setLong(2, film.getGenres().get(i).getId());
+                ps.setLong(2, genreList.get(i).getId());
             }
 
             @Override
@@ -156,16 +137,6 @@ public class FilmStorageImpl implements FilmStorage {
                 return film.getGenres().size();
             }
         });
-    }
-
-    private List<Genre> removeDuplicateGenre(List<Genre> lg) {
-        List<Genre> withoutDuplicateList = new ArrayList<>();
-        for (Genre genre : lg) {
-            if (!withoutDuplicateList.contains(genre)) {
-                withoutDuplicateList.add(genre);
-            }
-        }
-        return withoutDuplicateList;
     }
 
     private void deleteFilmGenres(Film film) {

@@ -28,7 +28,7 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
     public List<Film> getAll() {
         final List<Film> films = filmStorage.getAll();
         genreStorage.load(films);
-        return filmStorage.getAll();
+        return films;
     }
 
     @Override
@@ -43,9 +43,9 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
 
     @Override
     public Film findById(Long id) {
-        final List<Film> films = filmStorage.getAll();
-        genreStorage.load(films);
-        return filmStorage.findById(id);
+        final Film film = filmStorage.findById(id);
+        genreStorage.load(List.of(film));
+        return film;
     }
 
     @Override
@@ -60,8 +60,8 @@ public class FilmDbService implements CrudService<Film>, FilmLikeDbService {
 
     @Override
     public List<Film> showMostLikedFilms(Integer count) {
-        final List<Film> films = filmStorage.getAll();
+        final List<Film> films = filmLikeDbStorage.showMostLikedFilms(count);
         genreStorage.load(films);
-        return filmLikeDbStorage.showMostLikedFilms(count);
+        return films;
     }
 }

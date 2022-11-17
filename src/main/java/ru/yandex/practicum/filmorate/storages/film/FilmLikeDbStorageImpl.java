@@ -11,6 +11,9 @@ import ru.yandex.practicum.filmorate.models.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 @Repository
@@ -76,21 +79,7 @@ public class FilmLikeDbStorageImpl implements FilmLikeDbStorage {
                         .id(resultSet.getLong("MPA.ID"))
                         .name(resultSet.getString("MPA.NAME"))
                         .build())
-                .genres(putGenresOfFilm(resultSet.getLong(("id"))))
+                .genres(new LinkedHashSet<>())
                 .build();
-    }
-
-    private List<Genre> putGenresOfFilm(Long filmId) {
-        List<Genre> genres;
-        try {
-            String sqlQuery = "SELECT * FROM genres WHERE id IN(Select genre_id from film_genre where film_id = ?)";
-            genres = jdbcTemplate.query(sqlQuery, (rs, rowNum) -> Genre.builder()
-                    .id(rs.getLong("id"))
-                    .name(rs.getString("name"))
-                    .build(), filmId);
-            return genres;
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException(String.format("Film with id=%d not found.", filmId));
-        }
     }
 }

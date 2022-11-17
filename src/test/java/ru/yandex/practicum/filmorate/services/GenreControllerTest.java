@@ -16,9 +16,7 @@ import ru.yandex.practicum.filmorate.services.genre.GenreServiceImp;
 import ru.yandex.practicum.filmorate.services.mpa.MpaServiceImpl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -79,7 +77,7 @@ public class GenreControllerTest {
 
     @Test
     public void postNormalFilmWithOneGenre() {
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         film = Film.builder()
                 .id((long) 1)
@@ -93,12 +91,12 @@ public class GenreControllerTest {
                 .build();
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
+        assertEquals("Комедия", new ArrayList<>(filmService.findById(1L).getGenres()).get(0).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
     public void postNormalFilmWithDuplicateGenre() {
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(1L));
         film = Film.builder()
@@ -113,13 +111,13 @@ public class GenreControllerTest {
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
         assertEquals(1, filmService.findById(film.getId()).getGenres().size());
-        assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
+        assertEquals("Комедия", new ArrayList<>(filmService.findById(1L).getGenres()).get(0).getName(), "Названия жанров не совпадают ");
     }
 
 
     @Test
     public void postNormalFilmWithTwoGenre() {
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(2L));
         film = Film.builder()
@@ -135,7 +133,7 @@ public class GenreControllerTest {
         filmService.create(film);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
         assertEquals(2, filmService.findById(1L).getGenres().size(), "Количество жанров не совпадают ");
-        assertEquals("Драма", filmService.findById(1L).getGenres().get(1).getName(), "Названия жанров не совпадают ");
+        assertEquals("Драма", new ArrayList<>(filmService.findById(1L).getGenres()).get(1).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
@@ -150,7 +148,7 @@ public class GenreControllerTest {
                 .mpa(mpaService.findById(1L))
                 .build();
         filmService.create(film);
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         Film film2 = Film.builder()
                 .id((long) 1)
@@ -164,12 +162,12 @@ public class GenreControllerTest {
                 .build();
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
-        assertEquals("Комедия", filmService.findById(1L).getGenres().get(0).getName(), "Названия жанров не совпадают ");
+        assertEquals("Комедия", new ArrayList<>(filmService.findById(1L).getGenres()).get(0).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
     public void putNormalFilmWithTwoGenre() {
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(2L));
         film = Film.builder()
@@ -197,7 +195,7 @@ public class GenreControllerTest {
         filmService.update(film2);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
         assertEquals(3, filmService.findById(1L).getGenres().size(), "Количество жанров не совпадают ");
-        assertEquals("Мультфильм", filmService.findById(1L).getGenres().get(2).getName(), "Названия жанров не совпадают ");
+        assertEquals("Мультфильм", new ArrayList<>(filmService.findById(1L).getGenres()).get(2).getName(), "Названия жанров не совпадают ");
     }
 
     @Test
@@ -212,7 +210,7 @@ public class GenreControllerTest {
                 .mpa(mpaService.findById(1L))
                 .build();
         filmService.create(film);
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         Film film2 = Film.builder()
                 .id((long) 1)
@@ -225,7 +223,9 @@ public class GenreControllerTest {
                 .genres(genreList)
                 .build();
         filmService.update(film2);
-        genreList.remove(0);
+        ArrayList<Genre> removedList = new ArrayList<>(genreList);
+        removedList.remove(0);
+        LinkedHashSet<Genre> updatedList = new LinkedHashSet<>(removedList);
         Film film3 = Film.builder()
                 .id((long) 1)
                 .name("testFilm")
@@ -234,7 +234,7 @@ public class GenreControllerTest {
                 .duration(50)
                 .rate(4)
                 .mpa(mpaService.findById(1L))
-                .genres(genreList)
+                .genres(updatedList)
                 .build();
         filmService.update(film3);
         assertEquals(1, filmService.getAll().size(), "Количество фильмов не совпадает");
@@ -243,7 +243,7 @@ public class GenreControllerTest {
 
     @Test
     public void deleteGenreFilmWithThreeGenre() {
-        List<Genre> genreList = new ArrayList<>();
+        LinkedHashSet<Genre> genreList = new LinkedHashSet<>();
         genreList.add(genreService.findById(1L));
         genreList.add(genreService.findById(2L));
         genreList.add(genreService.findById(3L));
