@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class MpaControllerTest {
     private final JdbcTemplate jdbcTemplate;
-
     private final MpaServiceImpl mpaService;
 
     @BeforeEach
